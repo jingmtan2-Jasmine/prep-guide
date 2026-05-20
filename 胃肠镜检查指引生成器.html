@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>胃肠镜检查术前准备指引生成</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            /* 卓正医疗品牌色 */
+            --primary: #009FB1;
+            --primary-light: #5BC4CF;
+            --primary-dark: #1E859A;
+            --accent: #FF6F00;
+            --warning: #D32F2F;
+            --bg-light: #F5F5F5;
+            --text-dark: #212121;
+            --text-light: #757575;
+            --border: #E0E0E0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #E8F6F8 0%, #F0FDF9 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header-logo {
+            display: inline-block;
+            background: white;
+            padding: 16px 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 159, 177, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .header-logo img {
+            height: 44px;
+            width: auto;
+            display: block;
+        }
+
+        header h1 {
+            color: var(--primary-dark);
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .form-section h2 {
+            color: var(--primary);
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-group label .required {
+            color: var(--warning);
+        }
+
+        .paste-section {
+            background: linear-gradient(135deg, #E8F6F8 0%, #E8F6F8 100%);
+            border: 2px dashed var(--primary);
+        }
+
+        .paste-section h2 {
+            border-bottom-color: var(--accent);
+        }
+
+        .paste-box {
+            width: 100%;
+            min-height: 120px;
+            padding: 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: inherit;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .paste-box:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 159, 177, 0.15);
+        }
+
+        .paste-hint {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+
+        .paste-result {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .paste-result.success {
+            background: rgba(0, 159, 177, 0.1);
+            border: 1px solid var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .paste-result.error {
+            background: #FFEBEE;
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+
+        .btn-parse {
+            margin-top: 12px;
+            padding: 10px 24px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-parse:hover {
+            background: #E65100;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(0, 159, 177, 0.15);
+        }
+
+        .form-group .hint {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .gender-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .gender-option {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .gender-option:hover {
+            border-color: var(--primary-light);
+        }
+
+        .gender-option.selected {
+            border-color: var(--primary);
+            background: rgba(0, 159, 177, 0.1);
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 159, 177, 0.35);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* 指引预览 */
+        .preview-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            display: none;
+        }
+
+        .preview-section.visible {
+            display: block;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .preview-header h2 {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .btn-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-print {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-print:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-pdf {
+            padding: 10px 20px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-pdf:hover {
+            background: #E65100;
+        }
+
+        .btn-print:disabled,
+        .btn-pdf:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .guide-content {
+            background: #FEFEFE;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .guide-header {
+            text-align: center;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        .guide-header h1 {
+            color: var(--primary-dark);
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .patient-name {
+            color: var(--accent);
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 159, 177, 0.08);
+            border-radius: 10px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-item .label {
+            font-size: 12px;
+            color: var(--text-light);
+            text-transform: uppercase;
+        }
+
+        .info-item .value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .timeline {
+            margin: 24px 0;
+        }
+
+        .timeline h3 {
+            color: var(--primary-dark);
+            font-size: 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timeline-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        .timeline-table th,
+        .timeline-table td {
+            padding: 14px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .timeline-table th:nth-child(1) { width: 100px; }  /* 时间列 */
+        .timeline-table th:nth-child(2) { width: 90px; }   /* 步骤列 */
+        .timeline-table th:nth-child(3) { width: auto; }   /* 具体操作列 */
+        .timeline-table td:nth-child(2) { white-space: nowrap; }  /* 步骤不换行 */
+
+        .timeline-table th {
+            background: rgba(0, 159, 177, 0.1);
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .timeline-table tr:hover {
+            background: rgba(0, 159, 177, 0.03);
+        }
+
+        .time-cell {
+            font-weight: bold;
+            color: var(--primary-dark);
+            white-space: nowrap;
+        }
+
+        .alert-cell {
+            background: #FFF3E0 !important;
+        }
+
+        .alert-warning {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .section {
+            margin: 24px 0;
+        }
+
+        .section h4 {
+            color: var(--primary-dark);
+            font-size: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .diet-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 12px 0;
+        }
+
+        .diet-allowed, .diet-forbidden {
+            padding: 16px;
+            border-radius: 10px;
+        }
+
+        .diet-allowed {
+            background: rgba(0, 159, 177, 0.08);
+            border-left: 4px solid var(--primary);
+        }
+
+        .diet-forbidden {
+            background: #FFEBEE;
+            border-left: 4px solid var(--warning);
+        }
+
+        .diet-allowed h5, .diet-forbidden h5 {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .diet-allowed h5 { color: var(--primary-dark); }
+        .diet-forbidden h5 { color: var(--warning); }
+
+        .diet-allowed ul, .diet-forbidden ul {
+            font-size: 13px;
+            padding-left: 20px;
+            color: var(--text-dark);
+        }
+
+        .diet-allowed ul li, .diet-forbidden ul li {
+            margin-bottom: 4px;
+        }
+
+        .important-notes {
+            background: #FFF8E1;
+            border: 1px solid #FFE082;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .important-notes h4 {
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .important-notes ul {
+            padding-left: 24px;
+        }
+
+        .important-notes li {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .contact-info {
+            text-align: center;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #009FB1 0%, #1E859A 100%);
+            color: white;
+            border-radius: 10px;
+            margin-top: 16px;
+        }
+
+        .contact-info p {
+            margin: 6px 0;
+            font-size: 14px;
+            color: rgba(255,255,255,0.95);
+        }
+
+        .contact-info p[style*="opacity: 0.9"] {
+            color: rgba(255,255,255,0.9) !important;
+        }
+
+        .contact-info strong {
+            color: white;
+        }
+
+        .contact-info .phone {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 0;
+            padding-top: 16px;
+        }
+
+        .footer p {
+            margin: 6px 0;
+            font-size: 12px;
+        }
+
+        .footer p:first-child {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .footer p:last-child {
+            color: #fff;
+        }
+
+        /* ========== 响应式布局 - 手机适配 ========== */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+
+            header {
+                margin-bottom: 20px;
+            }
+
+            .header-logo {
+                padding: 12px 20px;
+            }
+
+            .header-logo img {
+                height: 36px;
+            }
+
+            header h1 {
+                font-size: 20px;
+            }
+
+            .form-section {
+                padding: 20px;
+                margin-bottom: 16px;
+                border-radius: 12px;
+            }
+
+            .form-section h2 {
+                font-size: 16px;
+                margin-bottom: 16px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .gender-group {
+                flex-direction: row;
+            }
+
+            .gender-option {
+                flex: 1;
+                text-align: center;
+                padding: 10px;
+            }
+
+            .btn-primary {
+                width: 100%;
+                padding: 14px 20px;
+                font-size: 16px;
+            }
+
+            .preview-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .preview-header h2 {
+                font-size: 18px;
+            }
+
+            .btn-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .btn-print,
+            .btn-pdf {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* 指引预览区域手机适配 */
+            .guide-content {
+                padding: 16px;
+            }
+
+            .guide-header {
+                padding: 16px;
+            }
+
+            .guide-header h1 {
+                font-size: 18px;
+            }
+
+            .patient-name {
+                font-size: 16px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .section {
+                padding: 16px;
+                margin-bottom: 12px;
+            }
+
+            .section h4 {
+                font-size: 15px;
+                margin-bottom: 10px;
+            }
+
+            .timeline-table {
+                font-size: 12px;
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .timeline-table tbody {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .timeline-table tr {
+                display: flex;
+                flex-direction: column;
+                background: #fafafa;
+                border-radius: 8px;
+                padding: 10px 12px;
+                border-left: 3px solid var(--primary);
+            }
+
+            .timeline-table tr.alert-cell {
+                background: #FFF3E0;
+                border-left-color: var(--accent);
+            }
+
+            .timeline-table td {
+                padding: 4px 0;
+                word-break: break-word;
+                white-space: normal;
+            }
+
+            .timeline-table td:first-child {
+                font-weight: bold;
+                color: var(--primary-dark);
+                font-size: 14px;
+            }
+
+            .timeline-table td:nth-child(2) {
+                font-weight: 600;
+                color: var(--text-dark);
+                font-size: 13px;
+            }
+
+            .timeline-table td:nth-child(3) {
+                color: var(--text-light);
+                font-size: 12px;
+                line-height: 1.5;
+            }
+
+            .important-notes {
+                padding: 16px;
+            }
+
+            .important-notes li {
+                font-size: 13px;
+            }
+
+            .contact-info {
+                padding: 16px;
+            }
+
+            .contact-info .phone {
+                font-size: 18px;
+            }
+
+            .footer {
+                padding: 12px;
+            }
+        }
+
+        /* 更小屏幕（320px-400px） */
+        @media screen and (max-width: 400px) {
+            body {
+                padding: 8px;
+            }
+
+            header h1 {
+                font-size: 18px;
+            }
+
+            .form-section {
+                padding: 16px;
+            }
+
+            .form-section h2 {
+                font-size: 15px;
+            }
+
+            .guide-header h1 {
+                font-size: 16px;
+            }
+
+            .section h4 {
+                font-size: 14px;
+            }
+
+            .timeline-table {
+                font-size: 11px;
+            }
+        }
+
+        @media print {
+            @page {
+                size: auto;
+                margin: 10mm;
+            }
+
+            html, body {
+                background: white;
+                padding: 0;
+                margin: 0;
+                font-size: 11px;
+                height: auto;
+                overflow: visible;
+            }
+
+            /* 隐藏所有非内容区域 */
+            header,
+            .form-section,
+            .preview-header,
+            .btn-primary {
+                display: none !important;
+            }
+
+            .container {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            .preview-section {
+                display: block !important;
+                box-shadow: none;
+                padding: 0;
+                margin: 0;
+                page-break-inside: avoid;
+            }
+
+            .guide-content {
+                border: none;
+                padding: 0;
+                page-break-inside: avoid;
+            }
+
+            /* 强制单页打印 */
+            .guide-content * {
+                page-break-inside: avoid;
+            }
+
+            /* 优化打印字体和间距 */
+            .guide-header {
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+            }
+
+            .guide-header h1 {
+                font-size: 16px;
+                margin-bottom: 8px;
+            }
+
+            .patient-name {
+                font-size: 16px;
+            }
+
+            .info-grid {
+                margin: 10px 0;
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .info-item .value {
+                font-size: 13px;
+            }
+
+            .section {
+                margin: 12px 0;
+            }
+
+            .section h4 {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+
+            .timeline-table {
+                font-size: 10px;
+                margin: 8px 0;
+            }
+
+            .timeline-table th,
+            .timeline-table td {
+                padding: 6px 4px;
+            }
+
+            .diet-grid {
+                gap: 8px;
+                margin: 8px 0;
+            }
+
+            .diet-allowed, .diet-forbidden {
+                padding: 8px;
+            }
+
+            .diet-allowed h5, .diet-forbidden h5 {
+                font-size: 11px;
+            }
+
+            .diet-allowed ul, .diet-forbidden ul {
+                font-size: 9px;
+            }
+
+            .important-notes {
+                padding: 10px;
+                margin: 12px 0;
+            }
+
+            .important-notes h4 {
+                font-size: 12px;
+            }
+
+            .important-notes li {
+                font-size: 9px;
+                margin-bottom: 3px;
+            }
+
+            .contact-info {
+                padding: 10px;
+                margin-top: 12px;
+            }
+
+            .contact-info p {
+                font-size: 10px;
+                margin: 3px 0;
+            }
+
+            .footer {
+                padding-top: 8px;
+            }
+
+            .footer p {
+                font-size: 9px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .diet-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline-table {
+                font-size: 13px;
+            }
+
+            .timeline-table th,
+            .timeline-table td {
+                padding: 10px 8px;
+            }
+        }
+
+        /* 列表项bullet颜色 */
+        .preview-content ul,
+        .important-notes ul,
+        .diet-allowed ul,
+        .diet-forbidden ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .preview-content ul li,
+        .important-notes ul li,
+        .diet-allowed ul li,
+        .diet-forbidden ul li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        .preview-content ul li::before,
+        .important-notes ul li::before,
+        .diet-allowed ul li::before,
+        .diet-forbidden ul li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        /* 手机端优化 */
+        @media screen and (max-width: 768px) {
+            .form-group input,
+            .form-group select,
+            textarea {
+                min-height: 48px !important;
+                font-size: 16px !important; /* 防止iOS缩放 */
+                padding: 12px 14px !important;
+            }
+
+            .gender-option {
+                min-height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .btn-primary,
+            .btn-parse,
+            .btn-print,
+            .btn-pdf {
+                min-height: 48px;
+                font-size: 16px;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .exam-type-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .exam-type-option {
+                min-height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-logo">
+                <img src="data:image/png;base64,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" alt="卓正医疗">
+            </div>
+            <h1>胃肠镜检查术前准备指引生成</h1>
+            <p>根据预约信息自动生成专属客户的准备指南</p>
+        </header>
+
+        <div class="form-section paste-section">
+            <h2>📋 预约信息（选填：可直接粘贴识别）</h2>
+            <textarea class="paste-box" id="pasteBox" placeholder="粘贴任意格式的预约信息（如从MIS或钉钉复制）&#10;&#10;示例：&#10;• 李四 5月15日 15:30 胃肠镜&#10;• 姓名张三 胃肠镜 3包&#10;• 或直接填写下方表单"></textarea>
+            <button class="btn-parse" onclick="parseAppointment()">
+                <span>🔍</span> 解析并填充
+            </button>
+            <div id="parseResult" class="paste-result" style="display: none;"></div>
+            <p class="paste-hint">🔍 粘贴后自动识别姓名、日期、时间；或直接填写下方表单</p>
+        </div>
+
+        <div class="form-section">
+            <h2>📋 基本信息</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>姓名 <span class="required">*</span></label>
+                    <input type="text" id="patientName" placeholder="请输入患者姓名">
+                </div>
+                <div class="form-group">
+                    <label>称呼 <span class="required">*</span></label>
+                    <div class="gender-group" id="genderGroup">
+                        <div class="gender-option selected" data-value="女士" onclick="selectGender(this)">♀ 女士</div>
+                        <div class="gender-option" data-value="先生" onclick="selectGender(this)">♂ 先生</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>语言</label>
+                    <div class="gender-group" id="languageGroup">
+                        <div class="gender-option selected" data-value="zh" onclick="selectLanguage(this)">🇨🇳 中文</div>
+                        <div class="gender-option" data-value="en" onclick="selectLanguage(this)">🇺🇸 English</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>📅 预约信息</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>预约日期 <span class="required">*</span></label>
+                    <input type="date" id="appointmentDate">
+                </div>
+                <div class="form-group">
+                    <label>预约时间 <span class="required">*</span></label>
+                    <input type="time" id="appointmentTime" step="1800">
+                </div>
+                <div class="form-group">
+                    <label>检查类型</label>
+                    <select id="examType">
+                        <option value="gastroscopy">仅胃镜</option>
+                        <option value="combined" selected>胃镜+肠镜（胃肠镜）</option>
+                        <option value="colonoscopy">仅肠镜</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>和爽用量</label>
+                    <select id="heshuangPacks">
+                        <option value="2">2包（2L溶液）</option>
+                        <option value="3" selected>3包（3L溶液）</option>
+                        <option value="4">4包（4L溶液）</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>💊 服药方案</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>检查时段</label>
+                    <select id="examPeriod" onchange="updateTimeOptions()">
+                        <option value="afternoon" selected>下午检查</option>
+                        <option value="morning">上午检查</option>
+                    </select>
+                    <span class="hint">上午检查：前一晚20:00开始分次服药；下午检查：当天上午单次服药</span>
+                </div>
+                <div class="form-group">
+                    <label>是否加服西甲硅油</label>
+                    <select id="simethicone">
+                        <option value="yes" selected>是（建议服用，消除气泡）</option>
+                        <option value="no">否</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="generateGuide()">
+            <span>▶</span> 生成专属指引
+        </button>
+
+        <div class="preview-section" id="previewSection">
+            <div class="preview-header">
+                <h2>📄 指引预览</h2>
+                <div class="btn-actions">
+                    <button class="btn-print" onclick="saveAsImage()">
+                        <span>📎</span> 保存图片
+                    </button>
+                    <button class="btn-pdf" onclick="saveAsPDF()">
+                        <span>📄</span> 另存 PDF
+                    </button>
+                </div>
+            </div>
+            <div class="guide-content" id="guideContent">
+                <!-- 动态生成的内容将在这里 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedGender = '女士';
+        let selectedLanguage = 'zh';
+        // 保存姓名和日期供导出函数使用
+        let exportPatientName = '';
+        let exportExamType = '';
+        let exportDate = '';
+
+        function selectLanguage(element) {
+            document.querySelectorAll('#languageGroup .gender-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedLanguage = element.dataset.value;
+        }
+
+        // 中英文双语内容配置
+        const i18n = {
+            // 中文
+            zh: {
+                title: '🩺 ${examTypeText}术前准备指南',
+                greeting: '尊敬的 <span class="patient-name">${selectedGender} ${name}</span>：',
+                subtitle: '以下是您的专属术前准备指引，请仔细阅读并严格执行',
+                labels: {
+                    appointmentDate: '预约日期',
+                    appointmentTime: '预约时间',
+                    examType: '检查类型',
+                    timeline: '核心时间轴',
+                    timelineDate: '日期',
+                    timelineTime: '时间',
+                    timelineEvent: '事项',
+                    timelineDesc: '请将以下时间表视为"闹钟"，严格执行：',
+                    medication: '服药步骤详解',
+                    medicationDrug: '您拿到的药：<strong>和爽</strong>共${heshuangPacks}包 ${simethiconeYes}',
+                    medicationTime: '时间',
+                    medicationStep: '步骤',
+                    medicationAction: '具体操作',
+                    medicationTip: '服药期间可以来回走动，促进肠道蠕动。西甲硅油能消除气泡，让医生看得更清楚，请务必服用。',
+                    fasting: '开始禁食',
+                    fastingDesc: '只能喝清流质：清水、清汤、不加奶的咖啡或茶、无色运动饮料、滤掉果渣的透明果汁（如苹果汁）',
+                    takeMed: '开始喝药',
+                    takeMedDesc: '1. 准备${volume}ml温水<br>2. 将${packs}包和爽倒入搅拌均匀<br>3. 在3小时内缓慢喝完${simethiconeDesc}',
+                    stopWater: '开始禁水',
+                    stopWaterDesc: '此后不能再喝任何水或液体，为确保麻醉安全，请严格遵守',
+                    firstDose: '第1次服用',
+                    firstDoseDesc: '1. 准备${volume}ml温水<br>2. 将${packs}包和爽倒入搅拌均匀<br>3. 缓慢喝完，服药后开始禁食（只能喝清流质）',
+                    secondDose: '第2次服用',
+                    secondDoseDesc: '1. 准备${volume}ml温水<br>2. 将${packs}包和爽倒入搅拌均匀<br>3. 在${packs}小时内缓慢喝完${simethiconeDesc}',
+                    lowResidue: '低渣饮食',
+                    dietTitle: '饮食限制（检查前一天）<br><small>${date} 开始</small>',
+                    dietAllowed: '建议选择',
+                    dietForbidden: '绝对禁止',
+                    dietAllowedItems: [
+                        '<strong>主食类：</strong>白粥、藕粉、白米饭、面条/米粉/米线',
+                        '<strong>蔬菜水果：</strong>去皮去籽的瓜类（如冬瓜）、土豆泥',
+                        '<strong>蛋白质：</strong>水煮鸡蛋、豆腐',
+                        '<strong>饮品：</strong>清水、清汤、无色运动饮料、滤掉果渣的透明果汁（如苹果汁、白葡萄汁）'
+                    ],
+                    dietForbiddenItems: [
+                        '<strong>粗粮/坚果：</strong>杂粮、全麦面包、坚果、瓜子等',
+                        '<strong>带籽水果：</strong>火龙果、奇异果、西瓜、草莓、番茄等',
+                        '<strong>高蛋白：</strong>所有肉类、奶制品、豆浆',
+                        '<strong>深色食物：</strong>酒类、咖啡、浓茶、红色/紫色食物'
+                    ],
+                    notesTitle: '其他重要提醒',
+                    notes: [
+                        '<strong>准时到达：</strong>请于预约时间准时或提前10分钟抵达诊所',
+                        '<strong>必须有陪人：</strong>您将接受麻醉，行动力会受影响，检查当天必须有成年亲友陪同',
+                        '<strong>女士请注意：</strong>请避开月经期进行此项检查',
+                        '<strong>药物说明：</strong>检查当天可用一小口水正常服用降压药、甲亢药；降糖药等请联系诊所确认',
+                        '<strong>物品准备：</strong>请取下活动假牙、眼镜，脱去饰物及金属物品交家属保管',
+                        '<strong>交通建议：</strong>无痛检查当天不可自己开车，建议提前规划路线',
+                        '<strong>和爽效果：</strong>如果您使用和爽后2小时仍未有排便反应，请及时联系我们',
+                        '<strong>美甲注意：</strong>如您有美甲（指甲油或甲片），请提前卸除右手食指的美甲，因术中需进行血氧饱和度监测，指甲油或甲片会影响监测数据的准确性，感谢配合'
+                    ],
+                    contactTitle: '如在术前准备过程中有持续呕吐或严重不适，请及时联系',
+                    contactAssistant: '联系专属医生助理',
+                    contactScan: '扫码添加助理',
+                    contactHelp: '一对一为您解答疑问',
+                    contactAddress: '深圳市南山区工业四路万融大厦A座5楼',
+                    footerClinic: '卓正医疗 · 蛇口手术及留观诊疗中心',
+                    footerNote: '本指引仅供参考，具体请遵医嘱。如有疑问，请致电咨询。'
+                },
+                examTypeDesc: {
+                    combined: '本次将同时进行胃镜和结肠镜检查',
+                    gastroscopy: '本次将进行胃镜检查',
+                    colonoscopy: '本次将进行结肠镜检查'
+                },
+                examTypeName: {
+                    gastroscopy: '胃镜检查',
+                    combined: '胃肠镜检查',
+                    colonoscopy: '结肠镜检查'
+                }
+            },
+            // 英文
+            en: {
+                title: '🩺 ${examTypeText} Pre-Procedure Preparation Guide',
+                greeting: 'Dear <span class="patient-name">${selectedGender} ${name}</span>,',
+                subtitle: 'Please read and follow your personalized preparation instructions carefully.',
+                labels: {
+                    appointmentDate: 'Appointment Date',
+                    appointmentTime: 'Appointment Time',
+                    examType: 'Exam Type',
+                    timeline: 'Medication Schedule',
+                    timelineDate: 'Date',
+                    timelineTime: 'Time',
+                    timelineEvent: 'Action',
+                    timelineDesc: 'Please follow this schedule strictly as your reference:',
+                    medication: 'Medication Instructions',
+                    medicationDrug: 'Your medication: <strong>PEG Solution</strong> ${heshuangPacks} packet(s) ${simethiconeYes}',
+                    medicationTime: 'Time',
+                    medicationStep: 'Step',
+                    medicationAction: 'Instructions',
+                    medicationTip: 'Walking during the preparation helps stimulate bowel movements. Simethicone eliminates bubbles for better visibility during the procedure.',
+                    fasting: 'Start Fasting',
+                    fastingDesc: 'Clear liquids only: water, clear soup, coffee/tea without milk, sports drinks, clear juice without pulp (e.g., apple juice)',
+                    takeMed: 'Take Bowel Prep',
+                    takeMedDesc: '1. Prepare ${volume}ml warm water<br>2. Dissolve ${packs} packet(s) of PEG solution<br>3. Drink slowly over 3 hours${simethiconeDesc}',
+                    stopWater: 'Stop All Liquids',
+                    stopWaterDesc: 'No water or liquids after this point. For your safety during sedation, please follow strictly.',
+                    firstDose: '1st Dose',
+                    firstDoseDesc: '1. Prepare ${volume}ml warm water<br>2. Dissolve ${packs} packet(s) of PEG solution<br>3. Drink slowly. Begin fasting after this (clear liquids only)',
+                    secondDose: '2nd Dose',
+                    secondDoseDesc: '1. Prepare ${volume}ml warm water<br>2. Dissolve ${packs} packet(s) of PEG solution<br>3. Drink slowly over ${packs} hours${simethiconeDesc}',
+                    lowResidue: 'Low-Residue Diet',
+                    dietTitle: 'Diet Restrictions<br><small>(Day Before Procedure, Start from ${date})</small>',
+                    dietAllowed: 'Allowed',
+                    dietForbidden: 'Avoid',
+                    dietAllowedItems: [
+                        '<strong>Staples:</strong> White rice, white rice porridge, lotus root powder, noodles/vermicelli/rice noodles (no brown/red/black varieties), white toast, white bread',
+                        '<strong>Fruits &amp; Vegetables:</strong> Peeled, seedless melons (e.g., winter melon), mashed potato',
+                        '<strong>Protein:</strong> Boiled eggs, tofu',
+                        '<strong>Beverages:</strong> Plain water, clear soup, colorless sports drinks, clear juice without pulp (e.g., apple juice, white grape juice)'
+                    ],
+                    dietForbiddenItems: [
+                        '<strong>Whole Grains &amp; Nuts:</strong> Coarse grains, whole wheat bread, nuts, seeds, etc.',
+                        '<strong>Seeded Fruits:</strong> Dragon fruit, kiwi, watermelon, strawberries, tomatoes, etc.',
+                        '<strong>High-Protein:</strong> All meats, dairy products, soy milk',
+                        '<strong>Dark-Colored Foods:</strong> Alcoholic beverages, coffee, strong tea, red/purple foods'
+                    ],
+                    notesTitle: 'Important Reminders',
+                    notes: [
+                        '<strong>Arrive on time:</strong> Please arrive at the clinic on time or 10 minutes early',
+                        '<strong>Companion required:</strong> You will receive sedation; please arrange for an adult friend/family member to accompany you',
+                        '<strong>Ladies:</strong> Please avoid scheduling during your menstrual period',
+                        '<strong>Medications:</strong> You may take blood pressure medication or thyroid medication with a small sip of water. Please contact us for diabetes medications',
+                        '<strong>Personal items:</strong> Please remove dentures, glasses, jewelry, and metal items and give them to your companion',
+                        '<strong>Transportation:</strong> Do not drive yourself after sedation. Please plan your route in advance',
+                        '<strong>Effectiveness:</strong> If no bowel movement occurs 2 hours after taking PEG solution, please contact us promptly',
+                        '<strong>Nail polish:</strong> Please remove nail polish from your right index finger. Gel or acrylic nails must also be removed from the right index finger as they affect blood oxygen monitoring during the procedure.'
+                    ],
+                    contactTitle: 'Contact us if you experience persistent vomiting or severe discomfort during preparation',
+                    contactAssistant: 'Your Personal Medical Assistant',
+                    contactScan: 'Scan to add assistant',
+                    contactHelp: 'Get one-on-one answers to your questions',
+                    contactAddress: '5/F, Block A, Wanrong Building, No.4 Gongye Road, Nanshan District, Shenzhen',
+                    footerClinic: 'Distinct Healthcare · Shekou Surgery & Observation Center',
+                    footerNote: 'This guide is for reference only. Please follow your doctor\'s advice. Contact us if you have questions.'
+                },
+                examTypeDesc: {
+                    combined: 'You are scheduled for both gastroscopy and colonoscopy procedures',
+                    gastroscopy: 'You are scheduled for a gastroscopy procedure',
+                    colonoscopy: 'You are scheduled for a colonoscopy procedure'
+                },
+                examTypeName: {
+                    gastroscopy: 'Gastroscopy',
+                    combined: 'Gastroscopy + Colonoscopy',
+                    colonoscopy: 'Colonoscopy'
+                }
+            }
+        };
+
+        // 辅助函数：获取国际化文本
+        function t(key, replacements = {}) {
+            const lang = i18n[selectedLanguage] || i18n.zh;
+            let text = lang;
+            const keys = key.split('.');
+            for (const k of keys) {
+                text = text[k];
+            }
+            // 替换占位符
+            for (const [placeholder, value] of Object.entries(replacements)) {
+                text = text.replace(new RegExp(`\\$\\{${placeholder}\\}`, 'g'), value);
+            }
+            return text;
+        }
+
+        // 获取导出文件名（名字+胃/肠镜+预约日期）
+        function getExportFilename(suffix) {
+            const name = exportPatientName || '患者';
+            const examTypeMap = {
+                'gastroscopy': '胃镜',
+                'combined': '胃肠镜',
+                'colonoscopy': '肠镜'
+            };
+            const examTypeName = examTypeMap[exportExamType] || '胃肠镜';
+            const dateStr = exportDate ? exportDate.replace(/-/g, '') : '';
+            return `${name}_${examTypeName}_${dateStr}.${suffix}`;
+        }
+
+        // 保存为图片
+        async function saveAsImage() {
+            const guideContent = document.getElementById('guideContent');
+            const btn = document.querySelector('.btn-print');
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<span>⏳</span> 生成中...';
+
+                const canvas = await html2canvas(guideContent, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                });
+
+                const link = document.createElement('a');
+                link.download = getExportFilename('png');
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (error) {
+                console.error('保存失败:', error);
+                alert('保存失败，请重试');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>📎</span> 保存图片';
+            }
+        }
+
+        // 另存为 PDF
+        async function saveAsPDF() {
+            const guideContent = document.getElementById('guideContent');
+            const btn = document.querySelector('.btn-pdf');
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<span>⏳</span> 生成中...';
+
+                const canvas = await html2canvas(guideContent, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+
+                // A4 尺寸：210 x 297 mm
+                const pdfWidth = 210;
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+                const pdf = new jsPDF({
+                    orientation: pdfHeight > pdfWidth ? 'portrait' : 'landscape',
+                    unit: 'mm',
+                    format: [pdfWidth, pdfHeight]
+                });
+
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(getExportFilename('pdf'));
+            } catch (error) {
+                console.error('PDF生成失败:', error);
+                alert('PDF生成失败，请重试');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>📄</span> 另存 PDF';
+            }
+        }
+
+        function selectGender(element) {
+            document.querySelectorAll('#genderGroup .gender-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedGender = element.dataset.value;
+        }
+
+        function parseAppointment() {
+            const text = document.getElementById('pasteBox').value.trim();
+            const resultDiv = document.getElementById('parseResult');
+
+            if (!text) {
+                resultDiv.className = 'paste-result error';
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = '❌ 请粘贴预约信息';
+                return;
+            }
+
+            const result = {
+                name: '',
+                date: '',
+                time: '',
+                examType: '',
+                packs: ''
+            };
+
+            const lines = text.split(/[\n,，;；]+/).map(l => l.trim()).filter(l => l);
+            const fullText = text.replace(/\s+/g, '');  // 去除所有空格用于匹配
+
+            // ========== 1. 解析姓名 - 自由模式：找第一个2-4个连续汉字 ==========
+            // 常见姓名汉字列表（增加识别准确性）
+            const commonNameChars = /[赵钱孙李周吴郑王冯陈褚卫蒋沈韩杨朱秦尤许何吕施张孔曹严华金魏陶姜戚谢邹喻柏水窦章云苏潘葛奚范彭郎鲁韦昌马苗凤花方俞任袁柳酆鲍史唐费廉岑薛雷贺倪汤滕殷罗毕郝邬安常乐于时傅皮卞齐康伍余元卜顾孟平黄和穆萧尹姚邵堪汪祁毛禹狄米贝明臧计伏成戴谈宋茅庞熊纪舒屈项祝董梁杜阮蓝闵席季麻强贾路娄危江童颜郭梅盛林刁钟徐邱骆高夏蔡田丁番palxmnestrHdoudy]/;
+
+            if (!result.name) {
+                // 策略1：找 "X名" 或 "姓名" 后面的内容
+                const nameLabelMatch = text.match(/[姓就]名[：:\s]*([\u4e00-\u9fa5]{2,4})/);
+                if (nameLabelMatch) {
+                    result.name = nameLabelMatch[1];
+                } else {
+                    // 策略2：在文本中找第一个2-4个连续汉字（排除常见词）
+                    const nameMatches = text.match(/[\u4e00-\u9fa5]{2,4}/g) || [];
+                    for (const match of nameMatches) {
+                        // 排除常见非姓名词汇
+                        if (!/^[检查预约时间日期电话手机地址号房间科室医生护士年年月日时分秒]/.test(match) &&
+                            !/[检查预约时间日期电话手机地址号房间科室医生护士年年月日时分秒]$/.test(match) &&
+                            match.length >= 2) {
+                            result.name = match;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // ========== 2. 解析日期 - 支持多种格式 ==========
+            const datePatterns = [
+                /(\d{4})年(\d{1,2})月(\d{1,2})日/,
+                /(\d{4})-(\d{1,2})-(\d{1,2})/,
+                /(\d{4})(\d{2})(\d{2})/,
+                /(\d{1,2})月(\d{1,2})日/,  // 需结合当前年份
+                /(\d{1,2})\/(\d{1,2})/  // 需结合当前年份
+            ];
+            for (const pattern of datePatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    if (match[1].length === 4) {
+                        result.date = `${match[1]}-${match[2].padStart(2,'0')}-${match[3].padStart(2,'0')}`;
+                    } else {
+                        // 短日期格式使用当前年份
+                        const year = new Date().getFullYear();
+                        result.date = `${year}-${match[1].padStart(2,'0')}-${match[2].padStart(2,'0')}`;
+                    }
+                    break;
+                }
+            }
+
+            // ========== 3. 解析时间 - 找 HH:MM 或 HH:MM 格式 ==========
+            const timeMatch = text.match(/(\d{1,2}):(\d{2})/);
+            if (timeMatch) {
+                const hour = parseInt(timeMatch[1]);
+                const minute = timeMatch[2];
+                if (hour >= 0 && hour <= 23) {
+                    result.time = `${String(hour).padStart(2,'0')}:${minute}`;
+                }
+            }
+
+            // 解析检查类型
+            const textLower = text.toLowerCase();
+            if (textLower.includes('胃肠') || textLower.includes('胃+肠') || textLower.includes('胃镜肠镜')) {
+                result.examType = 'combined';
+            } else if (textLower.includes('胃镜') && !textLower.includes('肠镜')) {
+                result.examType = 'gastroscopy';
+            } else if (textLower.includes('肠镜') || textLower.includes('结肠镜')) {
+                result.examType = 'colonoscopy';
+            }
+
+            // 解析和爽用量
+            const packMatch = text.match(/(\d)\s*包/);
+            if (packMatch) {
+                result.packs = packMatch[1];
+            }
+
+            // 判断上午/下午
+            if (result.time) {
+                const hour = parseInt(result.time.split(':')[0]);
+                if (hour >= 8 && hour <= 11) {
+                    document.getElementById('examPeriod').value = 'morning';
+                } else if (hour >= 13 && hour <= 16) {
+                    document.getElementById('examPeriod').value = 'afternoon';
+                }
+            }
+
+            // 填充表单
+            if (result.name) document.getElementById('patientName').value = result.name;
+            if (result.date) document.getElementById('appointmentDate').value = result.date;
+            if (result.time) document.getElementById('appointmentTime').value = result.time;
+            if (result.examType) document.getElementById('examType').value = result.examType;
+            if (result.packs) document.getElementById('heshuangPacks').value = result.packs;
+
+            // 判断性别
+            if (result.name) {
+                // 简单的性别判断：名字最后一个字
+                const lastChar = result.name.slice(-1);
+                const male = lastChar.match(/[君|轩|宇|浩|明|伟|强|磊|超|鹏|杰|凯|博|达|帆|翔|霖|晨|瑞|鑫|航|然|博|丞|睿|洋|威|豪|波|峰|峰|健|昌|诚|川|成|崇]/);
+                if (male) {
+                    document.querySelectorAll('.gender-option').forEach(el => el.classList.remove('selected'));
+                    document.querySelector('[data-value="先生"]').classList.add('selected');
+                    selectedGender = '先生';
+                }
+            }
+
+            // 显示解析结果
+            const foundItems = [];
+            if (result.name) foundItems.push(`姓名：${result.name}`);
+            if (result.date) foundItems.push(`日期：${result.date}`);
+            if (result.time) foundItems.push(`时间：${result.time}`);
+            if (result.examType) foundItems.push(`类型：${result.examType === 'combined' ? '胃肠镜' : result.examType === 'gastroscopy' ? '胃镜' : '肠镜'}`);
+            if (result.packs) foundItems.push(`和爽：${result.packs}包`);
+
+            resultDiv.className = 'paste-result success';
+            resultDiv.style.display = 'block';
+            if (foundItems.length > 0) {
+                resultDiv.innerHTML = `✅ 已解析并填充：${foundItems.join(' | ')}`;
+            } else {
+                resultDiv.className = 'paste-result error';
+                resultDiv.innerHTML = '⚠️ 仅识别到部分信息，请手动补充';
+            }
+        }
+
+        function updateTimeOptions() {
+            // 根据检查时段更新默认时间
+            const examPeriod = document.getElementById('examPeriod').value;
+            const appointmentTime = document.getElementById('appointmentTime');
+
+            if (!appointmentTime.value) {
+                appointmentTime.value = examPeriod === 'afternoon' ? '15:30' : '09:00';
+            }
+        }
+
+        function getWeekday(dateStr) {
+            const date = new Date(dateStr);
+            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            return weekdays[date.getDay()];
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const monthNames = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            return selectedLanguage === 'en' ? `${monthNames[month]} ${day}, ${year}` : `${year}年${month}月${day}日`;
+        }
+
+        function addHours(timeStr, hours) {
+            const [hoursNum, minutes] = timeStr.split(':').map(Number);
+            const totalMinutes = hoursNum * 60 + minutes + hours * 60;
+            const newHours = Math.floor(totalMinutes / 60);
+            const newMinutes = totalMinutes % 60;
+            return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
+        }
+
+        function subtractMinutes(timeStr, minutes) {
+            return addHours(timeStr, -minutes / 60);
+        }
+
+        // 准确时间表数据（根据图片中的表格）
+        const timeTable = {
+            morning: {
+                '08:30': { firstDrink: '前一天20:00', secondDrink2_3: '5:00', secondDrink4: '4:30', stopWater: '6:30', fasting: '前一天20:00' },
+                '09:30': { firstDrink: '前一天20:00', secondDrink2_3: '5:30', secondDrink4: '5:00', stopWater: '7:30', fasting: '前一天20:00' },
+                '10:30': { firstDrink: '前一天20:00', secondDrink2_3: '6:30', secondDrink4: '6:00', stopWater: '8:30', fasting: '前一天20:00' },
+                '11:30': { firstDrink: '前一天20:00', secondDrink2_3: '7:30', secondDrink4: '7:00', stopWater: '9:30', fasting: '前一天20:00' }
+            },
+            afternoon: {
+                '13:30': { fasting: '5:30', drink2_3: '8:30', drink4: '7:30', stopWater: '11:30' },
+                '14:30': { fasting: '6:30', drink2_3: '9:30', drink4: '8:30', stopWater: '12:30' },
+                '15:30': { fasting: '7:30', drink2_3: '10:30', drink4: '9:30', stopWater: '13:30' },
+                '16:30': { fasting: '8:30', drink2_3: '11:30', drink4: '10:30', stopWater: '14:30' }
+            }
+        };
+
+        function getNearestTime(period, timeStr) {
+            // 将时间转换为分钟数进行比较
+            const [h, m] = timeStr.split(':').map(Number);
+            const timeMinutes = h * 60 + m;
+
+            const times = Object.keys(timeTable[period]).sort();
+            let nearest = times[0];
+            let minDiff = Infinity;
+
+            for (const t of times) {
+                const [th, tm] = t.split(':').map(Number);
+                const tMinutes = th * 60 + tm;
+                const diff = Math.abs(tMinutes - timeMinutes);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    nearest = t;
+                }
+            }
+            return nearest;
+        }
+
+        function generateGuide() {
+            const name = document.getElementById('patientName').value.trim();
+            const appointmentDate = document.getElementById('appointmentDate').value;
+            const appointmentTime = document.getElementById('appointmentTime').value;
+            const examType = document.getElementById('examType').value;
+            const heshuangPacks = parseInt(document.getElementById('heshuangPacks').value);
+            const examPeriod = document.getElementById('examPeriod').value;
+            const simethicone = document.getElementById('simethicone').value;
+
+            // 更新导出用的全局变量
+            exportPatientName = name;
+            exportExamType = examType;
+            exportDate = appointmentDate;
+
+            if (!name) {
+                alert('请输入患者姓名');
+                return;
+            }
+            if (!appointmentDate || !appointmentTime) {
+                alert('请填写完整的预约信息');
+                return;
+            }
+
+            // 验证预约时间是否在支持范围内
+            const [hour, minute] = appointmentTime.split(':').map(Number);
+            if (examPeriod === 'morning' && (hour < 8 || hour > 11)) {
+                alert('上午检查仅支持 8:30-11:30 的预约时间');
+                return;
+            }
+            if (examPeriod === 'afternoon' && (hour < 13 || hour > 16)) {
+                alert('下午检查仅支持 13:30-16:30 的预约时间');
+                return;
+            }
+
+            // 获取当前语言配置
+            const lang = i18n[selectedLanguage] || i18n.zh;
+            
+            // 英文称呼映射
+            const genderMap = {
+                '女士': selectedLanguage === 'en' ? 'Ms.' : '女士',
+                '先生': selectedLanguage === 'en' ? 'Mr.' : '先生'
+            };
+            const displayGender = genderMap[selectedGender] || selectedGender;
+
+            const examTypeText = lang.examTypeName[examType];
+            const examTypeDesc = lang.examTypeDesc[examType];
+
+            // 计算时间节点
+            const formattedDate = formatDate(appointmentDate);
+            const weekday = getWeekday(appointmentDate);
+            const arriveTime = subtractMinutes(appointmentTime, 10);
+
+            // 计算前一天日期
+            const prevDate = new Date(appointmentDate);
+            prevDate.setDate(prevDate.getDate() - 1);
+            const prevDateFormatted = formatDate(prevDate.toISOString().split('T')[0]);
+
+            // 获取准确时间
+            const nearestTime = getNearestTime(examPeriod, appointmentTime);
+            const schedule = timeTable[examPeriod][nearestTime];
+
+            const simethiconeYes = simethicone === 'yes' ? (selectedLanguage === 'en' ? '+ Simethicone 1 bottle' : '+ 西甲硅油 1 瓶') : '';
+            const simethiconeDesc = simethicone === 'yes' ? (selectedLanguage === 'en' ? '<br>4. After finishing, take 15ml Simethicone' : '<br>4. 喝完后，用针筒抽取西甲硅油15ml服用') : '';
+            const arriveText = selectedLanguage === 'en' ? 'Please arrive 10 minutes early' : '请提前10分钟抵达诊所报到';
+            const lowResidueText = selectedLanguage === 'en' ? 'Low-Residue Diet' : '低渣饮食';
+
+            let timelineRows = [];
+            let medicationSteps = '';
+
+            if (examPeriod === 'afternoon') {
+                const fastingTime = schedule.fasting;
+                const drinkTime = heshuangPacks === 4 ? schedule.drink4 : schedule.drink2_3;
+                const stopWaterTime = schedule.stopWater;
+
+                timelineRows = [
+                    { date: prevDateFormatted, time: selectedLanguage === 'en' ? 'All day' : '全天', event: lowResidueText, isAlert: false },
+                    { date: formattedDate, time: fastingTime, event: (selectedLanguage === 'en' ? 'Start Fasting (clear liquids only)' : '⚠️ 开始禁食（只能喝清流质）'), isAlert: true },
+                    { date: formattedDate, time: drinkTime, event: (selectedLanguage === 'en' ? 'Take bowel prep (' : '开始喝药（') + heshuangPacks + (selectedLanguage === 'en' ? ' packets PEG + ' : '包和爽 + ') + heshuangPacks + (selectedLanguage === 'en' ? '000ml water)' : '000ml 水)') + simethiconeYes, isAlert: false },
+                    { date: formattedDate, time: stopWaterTime, event: (selectedLanguage === 'en' ? 'Stop All Liquids' : '⚠️ 开始禁水（不能再喝任何液体）'), isAlert: true },
+                    { date: formattedDate, time: arriveTime, event: arriveText, isAlert: false }
+                ];
+
+                medicationSteps = `
+                    <tr class="alert-cell">
+                        <td class="time-cell">${formattedDate} ${fastingTime}<br><small style="color:#009FB1">${selectedLanguage === 'en' ? '(Day of Procedure)' : '（检查当天）'}</small></td>
+                        <td class="alert-warning">${lang.labels.fasting}</td>
+                        <td class="alert-warning">${lang.labels.fastingDesc}</td>
+                    </tr>
+                    <tr>
+                        <td class="time-cell">${formattedDate} ${drinkTime}</td>
+                        <td>${lang.labels.takeMed}</td>
+                        <td>${lang.labels.takeMedDesc.replaceAll('${packs}', heshuangPacks).replace('${volume}', heshuangPacks * 1000).replace('${simethiconeDesc}', simethiconeDesc)}</td>
+                    </tr>
+                    <tr class="alert-cell">
+                        <td class="time-cell">${formattedDate} ${stopWaterTime}</td>
+                        <td class="alert-warning">${lang.labels.stopWater}</td>
+                        <td class="alert-warning">${lang.labels.stopWaterDesc}</td>
+                    </tr>
+                `;
+            } else {
+                const firstDrinkTime = schedule.firstDrink;
+                const secondDrinkTime = heshuangPacks === 4 ? schedule.secondDrink4 : schedule.secondDrink2_3;
+                const stopWaterTime = schedule.stopWater;
+
+                let firstPacks, secondPacks;
+                if (heshuangPacks === 2) {
+                    firstPacks = 1; secondPacks = 1;
+                } else if (heshuangPacks === 3) {
+                    firstPacks = 2; secondPacks = 1;
+                } else {
+                    firstPacks = 2; secondPacks = 2;
+                }
+
+                timelineRows = [
+                    { date: prevDateFormatted, time: selectedLanguage === 'en' ? 'All day' : '全天', event: lowResidueText, isAlert: false },
+                    { date: prevDateFormatted, time: '20:00', event: (selectedLanguage === 'en' ? '1st Dose (' : '第1次服用（') + firstPacks + (selectedLanguage === 'en' ? ' packet(s) PEG + ' : '包和爽 + ') + firstPacks + (selectedLanguage === 'en' ? '000ml water)' : '000ml 水') + (selectedLanguage === 'en' ? ', then fast' : '），服药后开始禁食'), isAlert: true },
+                    { date: formattedDate, time: secondDrinkTime, event: (selectedLanguage === 'en' ? '2nd Dose (' : '第2次服用（') + secondPacks + (selectedLanguage === 'en' ? ' packet(s) PEG + ' : '包和爽 + ') + secondPacks + (selectedLanguage === 'en' ? '000ml water)' : '000ml 水') + simethiconeYes, isAlert: false },
+                    { date: formattedDate, time: stopWaterTime, event: (selectedLanguage === 'en' ? 'Stop All Liquids' : '⚠️ 开始禁水（不能再喝任何液体）'), isAlert: true },
+                    { date: formattedDate, time: arriveTime, event: arriveText, isAlert: false }
+                ];
+
+                medicationSteps = `
+                    <tr class="alert-cell">
+                        <td class="time-cell">${prevDateFormatted} 20:00<br><small style="color:#009FB1">${selectedLanguage === 'en' ? '(Day before)' : '（检查前一天）'}</small></td>
+                        <td class="alert-warning">${lang.labels.firstDose}</td>
+                        <td class="alert-warning">${lang.labels.firstDoseDesc.replaceAll('${packs}', firstPacks).replace('${volume}', firstPacks * 1000)}</td>
+                    </tr>
+                    <tr>
+                        <td class="time-cell">${formattedDate} ${secondDrinkTime}</td>
+                        <td>${lang.labels.secondDose}</td>
+                        <td>${lang.labels.secondDoseDesc.replaceAll('${packs}', secondPacks).replace('${volume}', secondPacks * 1000).replace('${simethiconeDesc}', simethiconeDesc)}</td>
+                    </tr>
+                    <tr class="alert-cell">
+                        <td class="time-cell">${formattedDate} ${stopWaterTime}</td>
+                        <td class="alert-warning">${lang.labels.stopWater}</td>
+                        <td class="alert-warning">${lang.labels.stopWaterDesc}</td>
+                    </tr>
+                `;
+            }
+
+            const title = lang.title.replace('${examTypeText}', examTypeText);
+            const greeting = lang.greeting.replace('${name}', name).replace('${selectedGender}', displayGender);
+            const dietTitle = lang.labels.dietTitle.replace('${date}', prevDateFormatted);
+
+            const html = generateHTML(title, greeting, formattedDate, weekday, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, simethiconeDesc);
+
+            document.getElementById('guideContent').innerHTML = html;
+            document.getElementById('previewSection').classList.add('visible');
+            document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateHTML(title, greeting, formattedDate, weekday, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, simethiconeDesc) {
+            return `
+                <div class="guide-header">
+                    <h1>${title}</h1>
+                    <p>${greeting}</p>
+                    <p style="color: var(--text-light); font-size: 14px; margin-top: 8px;">${lang.subtitle}</p>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">${lang.labels.appointmentDate}</span>
+                        <span class="value">${formattedDate}${selectedLanguage === 'en' ? '' : '（' + weekday + '）'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">${lang.labels.appointmentTime}</span>
+                        <span class="value">${appointmentTime}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">${lang.labels.examType}</span>
+                        <span class="value">${examTypeText}</span>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h4>⏰ ${lang.labels.timeline}</h4>
+                    <p style="color: var(--text-light); font-size: 13px; margin-bottom: 12px;">
+                        ${examTypeDesc}。${lang.labels.timelineDesc}
+                    </p>
+                    <table class="timeline-table">
+                        <thead>
+                            <tr>
+                                <th>${lang.labels.timelineDate}</th>
+                                <th>${lang.labels.timelineTime}</th>
+                                <th>${lang.labels.timelineEvent}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${timelineRows.map(row => `
+                                <tr ${row.isAlert ? 'class="alert-cell"' : ''}>
+                                    <td class="time-cell">${row.date}${row.date === prevDateFormatted ? (selectedLanguage === 'en' ? '<br><small style="color:#009FB1">(Day before)</small>' : '<br><small style="color:#009FB1">（检查前一天）</small>') : ''}</td>
+                                    <td class="time-cell">${row.time}</td>
+                                    <td ${row.isAlert ? 'class="alert-warning"' : ''}>${row.event}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="section">
+                    <h4>💊 ${lang.labels.medication}</h4>
+                    <p style="margin-bottom: 12px;">
+                        ${lang.labels.medicationDrug.replace('${heshuangPacks}', heshuangPacks).replace('${simethiconeYes}', simethiconeYes)}
+                    </p>
+                    <table class="timeline-table">
+                        <thead>
+                            <tr>
+                                <th>${lang.labels.medicationTime}</th>
+                                <th>${lang.labels.medicationStep}</th>
+                                <th>${lang.labels.medicationAction}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${medicationSteps}
+                        </tbody>
+                    </table>
+                    <div style="background: #E3F2FD; padding: 12px 16px; border-radius: 8px; margin-top: 12px; font-size: 13px;">
+                        <strong>${selectedLanguage === 'en' ? 'Tip:' : '温馨提示：'}</strong> ${lang.labels.medicationTip}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h4>🍽️ ${dietTitle}</h4>
+                    <div class="diet-grid">
+                        <div class="diet-allowed">
+                            <h5>✅ ${lang.labels.dietAllowed}</h5>
+                            <ul>
+                                ${lang.labels.dietAllowedItems.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="diet-forbidden">
+                            <h5>🚫 ${lang.labels.dietForbidden}</h5>
+                            <ul>
+                                ${lang.labels.dietForbiddenItems.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="important-notes">
+                    <h4>⚠️ ${lang.labels.notesTitle}</h4>
+                    <ul>
+                        ${lang.labels.notes.map(note => `<li>${note}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="contact-info">
+                    <p style="color: #fff;">${lang.labels.contactTitle}</p>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 8px;">
+                        <div style="text-align: center;">
+                            <p style="font-size: 14px; margin-bottom: 4px; color: #fff;"><strong>${lang.labels.contactAssistant}</strong></p>
+                            <p style="font-size: 12px; color: #e8f5e9;">${lang.labels.contactScan}</p>
+                            <p style="font-size: 12px; color: #e8f5e9;">${lang.labels.contactHelp}</p>
+                        </div>
+                        <img src="data:image/png;base64,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" alt="Assistant QR" style="width: 100px; height: 100px;">
+                    </div>
+                    <p style="margin-top: 8px; font-size: 12px;"><strong>${lang.labels.contactAddress}</strong></p>
+                </div>
+
+                <div class="footer">
+                    <p>${lang.labels.footerClinic}</p>
+                    <p>${lang.labels.footerNote}</p>
+                </div>
+            `;
+        }
+
+        // 初始化默认日期为明天
+        document.addEventListener('DOMContentLoaded', function() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('appointmentDate').value = tomorrow.toISOString().split('T')[0];
+            document.getElementById('appointmentTime').value = '15:30';
+        });
+    </script>
+</body>
+</html>
