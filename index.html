@@ -1729,7 +1729,7 @@
                 timelineRows = [
                     { date: prevDateFormatted, time: selectedLanguage === 'en' ? 'All day' : '全天', event: lowResidueText, isAlert: false },
                     { date: prevDateFormatted, time: '20:00', event: (selectedLanguage === 'en' ? '1st Dose (' : '第1次服用（') + firstPacks + (selectedLanguage === 'en' ? ' packet(s) PEG + ' : '包和爽 + ') + firstPacks + (selectedLanguage === 'en' ? '000ml water)' : '000ml 水') + (selectedLanguage === 'en' ? ', then fast' : '），服药后开始禁食'), isAlert: true },
-                    { date: formattedDate, time: secondDrinkTime, event: (selectedLanguage === 'en' ? '2nd Dose (' : '第2次服用（') + secondPacks + (selectedLanguage === 'en' ? ' packet(s) PEG + ' : '包和爽 + ') + secondPacks + (selectedLanguage === 'en' ? '000ml water)' : '000ml 水') + simethiconeYes, isAlert: false },
+                    { date: formattedDate, time: secondDrinkTime, event: (selectedLanguage === 'en' ? '2nd Dose (' : '第2次服用（') + secondPacks + (selectedLanguage === 'en' ? ' packet(s) PEG + ' : '包和爽 + ') + secondPacks + (selectedLanguage === 'en' ? '000ml water)' : '000ml 水）') + simethiconeYes, isAlert: false },
                     { date: formattedDate, time: stopWaterTime, event: (selectedLanguage === 'en' ? 'Stop All Liquids' : '⚠️ 开始禁水（不能再喝任何液体）'), isAlert: true },
                     { date: formattedDate, time: arriveTime, event: arriveText, isAlert: false }
                 ];
