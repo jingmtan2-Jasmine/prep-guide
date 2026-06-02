@@ -1897,16 +1897,15 @@
             const title = lang.title.replace('${examTypeText}', examTypeText);
             const greeting = lang.greeting.replace('${name}', name).replace('${selectedGender}', displayGender);
             const dietTitle = lang.labels.dietTitle.replace('${date}', prevDateFormatted);
-            const threeDayDietTitle = lang.labels.threeDayTitle.replace('${date}', date3BeforeFormatted);
 
-            const html = generateHTML(title, greeting, formattedDate, weekday, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, simethiconeDesc, isGastroscopyOnly, threeDayDietTitle, date3BeforeFormatted);
+            const html = generateHTML(title, greeting, formattedDate, weekday, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, simethiconeDesc, isGastroscopyOnly);
 
             document.getElementById('guideContent').innerHTML = html;
             document.getElementById('previewSection').classList.add('visible');
             document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function generateHTML(title, greeting, formattedDate, weekday, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, simethiconeDesc, isGastroscopyOnly, threeDayDietTitle, date3BeforeFormatted) {
+        function generateHTML(title, greeting, formattedDate, weekday, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, simethiconeDesc, isGastroscopyOnly) {
             return `
                 <div class="guide-header">
                     <h1>${title}</h1>
@@ -1952,32 +1951,6 @@
                             `).join('')}
                         </tbody>
                     </table>
-                </div>
-
-                ${isGastroscopyOnly ? '' : `
-                <div class="section">
-                    <h4><span class="emoji">🔔</span> ${threeDayDietTitle}</h4>
-                    <p style="color: var(--text-light); font-size: 13px; margin-bottom: 12px;">
-                        ${lang.labels.threeDayWarning}
-                    </p>
-                    <div class="diet-grid">
-                        <div class="diet-allowed">
-                            <h5><span class="emoji">✅</span> ${lang.labels.threeDayAllowed}</h5>
-                            <ul>
-                                ${lang.labels.threeDayAllowedItems.map(item => `<li>${item}</li>`).join('')}
-                            </ul>
-                        </div>
-                        <div class="diet-forbidden">
-                            <h5><span class="emoji">🚫</span> ${lang.labels.threeDayForbidden}</h5>
-                            <ul>
-                                ${lang.labels.threeDayForbiddenItems.map(item => `<li>${item}</li>`).join('')}
-                            </ul>
-                        </div>
-                    </div>
-                    <div style="background: #FFF3E0; padding: 12px 16px; border-radius: 8px; margin-top: 12px; font-size: 13px;">
-                        <strong>${lang.labels.threeDayStopIron}</strong>
-                    </div>
-                    ${lang.labels.threeDayLifestyle.map(item => `<div style="font-size: 13px; margin-top: 6px; padding-left: 8px;">${item}</div>`).join('')}
                 </div>
 
                 <div class="section">
