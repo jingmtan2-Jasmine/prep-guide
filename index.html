@@ -1070,13 +1070,13 @@
                 </div>
                 <div class="form-group">
                     <label>检查类型</label>
-                    <select id="examType">
+                    <select id="examType" onchange="toggleGastroscopyMode()">
                         <option value="gastroscopy">仅胃镜</option>
                         <option value="combined" selected>胃镜+肠镜（胃肠镜）</option>
                         <option value="colonoscopy">仅肠镜</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="heshuangPacksGroup">
                     <label>和爽用量</label>
                     <select id="heshuangPacks">
                         <option value="2">2包（2L溶液）</option>
@@ -1087,7 +1087,7 @@
             </div>
         </div>
 
-        <div class="form-section">
+        <div class="form-section" id="medicationSection">
             <h2><span class="emoji">💊</span> 服药方案</h2>
             <div class="form-grid">
                 <div class="form-group">
@@ -1193,6 +1193,22 @@
                         '<strong>深色食物：</strong>酒类、咖啡、浓茶、红色/紫色食物'
                     ],
                     notesTitle: '其他重要提醒',
+                    gastroscopyPrep: {
+                        sectionTitle: '胃镜检查须知',
+                        fastingRule: '检查前 <strong>8 小时禁食</strong>（包含豆浆、米汤等），不能喝牛奶、咖啡、果汁等有颜色液体',
+                        waterRule: '检查前 <strong>2 小时禁水</strong>，此后不能再喝任何液体',
+                        idCard: '请携带有效<strong>身份证件</strong>',
+                        companion: '检查当日<strong>不能自行开车</strong>，且需有<strong>成年家属全程陪同</strong>；若无陪同人员，检查可能需要重新安排时间',
+                        accessories: '检查期间不能携带<strong>隐形眼镜</strong>及<strong>所有饰品</strong>，且需祛除<strong>指甲油</strong>',
+                        nailPolish: '请于检查前祛除右手食指的指甲油或甲片，以确保血氧饱和度监测准确',
+                        medication: '如近期有服用药品，请提前告知医生',
+                        timelineDesc: '请将以下时间表视为"闹钟"，严格执行：',
+                        fastingLabel: '开始禁食',
+                        fastingDetail: '不能进食，不能喝牛奶、咖啡、果汁等有颜色液体；只可以喝清水',
+                        stopWaterLabel: '开始禁水',
+                        stopWaterDetail: '此后不能再喝任何水或液体，为确保麻醉安全，请严格遵守',
+                        arriveLabel: '请提前10分钟抵达诊所报到'
+                    },
                     notes: [
                         '<strong>准时到达：</strong>请于预约时间准时或提前10分钟抵达诊所',
                         '<strong>必须有陪人：</strong>您将接受麻醉，行动力会受影响，检查当天必须有成年亲友陪同',
@@ -1269,6 +1285,22 @@
                         '<strong>Dark-Colored Foods:</strong> Alcoholic beverages, coffee, strong tea, red/purple foods'
                     ],
                     notesTitle: 'Important Reminders',
+                    gastroscopyPrep: {
+                        sectionTitle: 'Gastroscopy Preparation',
+                        fastingRule: '<strong>No food for 8 hours</strong> before procedure (including soy milk, rice water, etc.). Avoid milk, coffee, juice and any colored liquids.',
+                        waterRule: '<strong>No liquids for 2 hours</strong> before procedure. Nothing to drink after this point.',
+                        idCard: 'Please bring a valid <strong>ID document</strong>',
+                        companion: 'You <strong>must not drive</strong> on the day of procedure and must have an <strong>adult companion</strong> present throughout; if no companion, the procedure may need to be rescheduled',
+                        accessories: 'No <strong>contact lenses</strong> or <strong>jewelry</strong> during the procedure; please remove all <strong>nail polish</strong>',
+                        nailPolish: 'Please remove nail polish or gel nails from your right index finger before the procedure to ensure accurate blood oxygen monitoring',
+                        medication: 'Please inform your doctor of any medications you are currently taking',
+                        timelineDesc: 'Please follow this schedule strictly as your reference:',
+                        fastingLabel: 'Start Fasting',
+                        fastingDetail: 'No food allowed. No milk, coffee, juice or colored beverages. Plain water only.',
+                        stopWaterLabel: 'Stop All Liquids',
+                        stopWaterDetail: 'No water or liquids after this point. For your safety during sedation, please follow strictly.',
+                        arriveLabel: 'Please arrive 10 minutes early'
+                    },
                     notes: [
                         '<strong>Arrive on time:</strong> Please arrive at the clinic on time or 10 minutes early',
                         '<strong>Companion required:</strong> You will receive sedation; please arrange for an adult friend/family member to accompany you',
@@ -1582,7 +1614,10 @@
 
         function addHours(timeStr, hours) {
             const [hoursNum, minutes] = timeStr.split(':').map(Number);
-            const totalMinutes = hoursNum * 60 + minutes + hours * 60;
+            let totalMinutes = hoursNum * 60 + minutes + hours * 60;
+            // 处理跨天（负数）
+            if (totalMinutes < 0) totalMinutes += 24 * 60;
+            if (totalMinutes >= 24 * 60) totalMinutes -= 24 * 60;
             const newHours = Math.floor(totalMinutes / 60);
             const newMinutes = totalMinutes % 60;
             return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
@@ -1629,6 +1664,14 @@
             return nearest;
         }
 
+        // 切换胃镜专属模式（隐藏/显示和爽/服药相关表单）
+        function toggleGastroscopyMode() {
+            const examType = document.getElementById('examType').value;
+            const isGastroscopyOnly = examType === 'gastroscopy';
+            document.getElementById('heshuangPacksGroup').style.display = isGastroscopyOnly ? 'none' : '';
+            document.getElementById('medicationSection').style.display = isGastroscopyOnly ? 'none' : '';
+        }
+
         function generateGuide() {
             const name = document.getElementById('patientName').value.trim();
             const appointmentDate = document.getElementById('appointmentDate').value;
@@ -1654,13 +1697,15 @@
 
             // 验证预约时间是否在支持范围内
             const [hour, minute] = appointmentTime.split(':').map(Number);
-            if (examPeriod === 'morning' && (hour < 8 || hour > 11)) {
-                alert('上午检查仅支持 8:30-11:30 的预约时间');
-                return;
-            }
-            if (examPeriod === 'afternoon' && (hour < 13 || hour > 16)) {
-                alert('下午检查仅支持 13:30-16:30 的预约时间');
-                return;
+            if (examType !== 'gastroscopy') {
+                if (examPeriod === 'morning' && (hour < 8 || hour > 11)) {
+                    alert('上午检查仅支持 8:30-11:30 的预约时间');
+                    return;
+                }
+                if (examPeriod === 'afternoon' && (hour < 13 || hour > 16)) {
+                    alert('下午检查仅支持 13:30-16:30 的预约时间');
+                    return;
+                }
             }
 
             // 获取当前语言配置
@@ -1697,8 +1742,33 @@
 
             let timelineRows = [];
             let medicationSteps = '';
+            let isGastroscopyOnly = (examType === 'gastroscopy');
 
-            if (examPeriod === 'afternoon') {
+            if (isGastroscopyOnly) {
+                // 胃镜专属逻辑：禁食8小时前、禁水2小时前
+                const gastroPrep = lang.labels.gastroscopyPrep;
+                const fastingTime = subtractMinutes(appointmentTime, 8 * 60);
+                const stopWaterTime = subtractMinutes(appointmentTime, 2 * 60);
+
+                timelineRows = [
+                    { date: formattedDate, time: fastingTime, event: (selectedLanguage === 'en' ? '<span class="emoji">⚠️</span> Start Fasting' : '<span class="emoji">⚠️</span> 开始禁食'), isAlert: true },
+                    { date: formattedDate, time: stopWaterTime, event: (selectedLanguage === 'en' ? '<span class="emoji">⚠️</span> Stop All Liquids' : '<span class="emoji">⚠️</span> 开始禁水'), isAlert: true },
+                    { date: formattedDate, time: arriveTime, event: gastroPrep.arriveLabel, isAlert: false }
+                ];
+
+                medicationSteps = `
+                    <tr class="alert-cell">
+                        <td class="time-cell">${formattedDate} ${fastingTime}</td>
+                        <td class="alert-warning">${gastroPrep.fastingLabel}</td>
+                        <td class="alert-warning">${gastroPrep.fastingDetail}</td>
+                    </tr>
+                    <tr class="alert-cell">
+                        <td class="time-cell">${formattedDate} ${stopWaterTime}</td>
+                        <td class="alert-warning">${gastroPrep.stopWaterLabel}</td>
+                        <td class="alert-warning">${gastroPrep.stopWaterDetail}</td>
+                    </tr>
+                `;
+            } else if (examPeriod === 'afternoon') {
                 const fastingTime = schedule.fasting;
                 const drinkTime = heshuangPacks === 4 ? schedule.drink4 : schedule.drink2_3;
                 const stopWaterTime = schedule.stopWater;
@@ -1773,14 +1843,14 @@
             const greeting = lang.greeting.replace('${name}', name).replace('${selectedGender}', displayGender);
             const dietTitle = lang.labels.dietTitle.replace('${date}', prevDateFormatted);
 
-            const html = generateHTML(title, greeting, formattedDate, weekday, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, simethiconeDesc);
+            const html = generateHTML(title, greeting, formattedDate, weekday, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, simethiconeDesc, isGastroscopyOnly);
 
             document.getElementById('guideContent').innerHTML = html;
             document.getElementById('previewSection').classList.add('visible');
             document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function generateHTML(title, greeting, formattedDate, weekday, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, simethiconeDesc) {
+        function generateHTML(title, greeting, formattedDate, weekday, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, simethiconeDesc, isGastroscopyOnly) {
             return `
                 <div class="guide-header">
                     <h1>${title}</h1>
@@ -1828,6 +1898,34 @@
                     </table>
                 </div>
 
+                ${isGastroscopyOnly ? `
+                <div class="section">
+                    <h4><span class="emoji">📋</span> ${lang.labels.gastroscopyPrep.sectionTitle}</h4>
+                    <table class="timeline-table">
+                        <thead>
+                            <tr>
+                                <th>${lang.labels.medicationTime}</th>
+                                <th>${lang.labels.medicationStep}</th>
+                                <th>${lang.labels.medicationAction}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${medicationSteps}
+                        </tbody>
+                    </table>
+                    <div style="background: #FFF8E1; border-left: 4px solid #FF6F00; padding: 12px 16px; border-radius: 8px; margin-top: 12px; font-size: 13px;">
+                        <ul style="margin: 0; padding-left: 16px;">
+                            <li>${lang.labels.gastroscopyPrep.fastingRule}</li>
+                            <li>${lang.labels.gastroscopyPrep.waterRule}</li>
+                            <li>${lang.labels.gastroscopyPrep.idCard}</li>
+                            <li>${lang.labels.gastroscopyPrep.companion}</li>
+                            <li>${lang.labels.gastroscopyPrep.accessories}</li>
+                            <li>${lang.labels.gastroscopyPrep.nailPolish}</li>
+                            <li>${lang.labels.gastroscopyPrep.medication}</li>
+                        </ul>
+                    </div>
+                </div>
+                ` : `
                 <div class="section">
                     <h4><span class="emoji">💊</span> ${lang.labels.medication}</h4>
                     <p style="margin-bottom: 12px;">
@@ -1867,6 +1965,7 @@
                         </div>
                     </div>
                 </div>
+                `}
 
                 <div class="important-notes">
                     <h4><span class="emoji">⚠️</span> ${lang.labels.notesTitle}</h4>
@@ -1901,6 +2000,7 @@
             tomorrow.setDate(tomorrow.getDate() + 1);
             document.getElementById('appointmentDate').value = tomorrow.toISOString().split('T')[0];
             document.getElementById('appointmentTime').value = '15:30';
+            toggleGastroscopyMode(); // 初始化表单显示状态
         });
     </script>
     <!-- 保存功能库：defer 延迟加载，不阻塞页面渲染 -->
