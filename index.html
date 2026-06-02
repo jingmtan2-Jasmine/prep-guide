@@ -1751,8 +1751,8 @@
                 const stopWaterTime = subtractMinutes(appointmentTime, 2 * 60);
 
                 timelineRows = [
-                    { date: formattedDate, time: fastingTime, event: (selectedLanguage === 'en' ? '<span class="emoji">⚠️</span> Start Fasting' : '<span class="emoji">⚠️</span> 开始禁食'), isAlert: true },
-                    { date: formattedDate, time: stopWaterTime, event: (selectedLanguage === 'en' ? '<span class="emoji">⚠️</span> Stop All Liquids' : '<span class="emoji">⚠️</span> 开始禁水'), isAlert: true },
+                    { date: formattedDate, time: fastingTime, event: `<span class="emoji">⚠️</span> ${gastroPrep.fastingLabel}<br><small style="color:#757575">${gastroPrep.fastingDetail}</small>`, isAlert: true },
+                    { date: formattedDate, time: stopWaterTime, event: `<span class="emoji">⚠️</span> ${gastroPrep.stopWaterLabel}<br><small style="color:#757575">${gastroPrep.stopWaterDetail}</small>`, isAlert: true },
                     { date: formattedDate, time: arriveTime, event: gastroPrep.arriveLabel, isAlert: false }
                 ];
 
