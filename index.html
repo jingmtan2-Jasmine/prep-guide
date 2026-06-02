@@ -1898,34 +1898,7 @@
                     </table>
                 </div>
 
-                ${isGastroscopyOnly ? `
-                <div class="section">
-                    <h4><span class="emoji">📋</span> ${lang.labels.gastroscopyPrep.sectionTitle}</h4>
-                    <table class="timeline-table">
-                        <thead>
-                            <tr>
-                                <th>${lang.labels.medicationTime}</th>
-                                <th>${lang.labels.medicationStep}</th>
-                                <th>${lang.labels.medicationAction}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${medicationSteps}
-                        </tbody>
-                    </table>
-                    <div style="background: #FFF8E1; border-left: 4px solid #FF6F00; padding: 12px 16px; border-radius: 8px; margin-top: 12px; font-size: 13px;">
-                        <ul style="margin: 0; padding-left: 16px;">
-                            <li>${lang.labels.gastroscopyPrep.fastingRule}</li>
-                            <li>${lang.labels.gastroscopyPrep.waterRule}</li>
-                            <li>${lang.labels.gastroscopyPrep.idCard}</li>
-                            <li>${lang.labels.gastroscopyPrep.companion}</li>
-                            <li>${lang.labels.gastroscopyPrep.accessories}</li>
-                            <li>${lang.labels.gastroscopyPrep.nailPolish}</li>
-                            <li>${lang.labels.gastroscopyPrep.medication}</li>
-                        </ul>
-                    </div>
-                </div>
-                ` : `
+                ${isGastroscopyOnly ? '' : `
                 <div class="section">
                     <h4><span class="emoji">💊</span> ${lang.labels.medication}</h4>
                     <p style="margin-bottom: 12px;">
@@ -1970,7 +1943,7 @@
                 <div class="important-notes">
                     <h4><span class="emoji">⚠️</span> ${lang.labels.notesTitle}</h4>
                     <ul>
-                        ${lang.labels.notes.map(note => `<li>${note}</li>`).join('')}
+                        ${(isGastroscopyOnly ? lang.labels.notes.filter(note => !note.includes('和爽效果') && !note.includes('Effectiveness:')) : lang.labels.notes).map(note => `<li>${note}</li>`).join('')}
                     </ul>
                 </div>
 
