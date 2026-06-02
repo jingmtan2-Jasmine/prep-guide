@@ -1468,12 +1468,10 @@
             const fullText = text.replace(/\s+/g, '');  // 去除所有空格用于匹配
 
             // ========== 1. 解析姓名 - 自由模式：找第一个2-4个连续汉字 ==========
-            // 常见姓名汉字列表（增加识别准确性）
-            const commonNameChars = /[赵钱孙李周吴郑王冯陈褚卫蒋沈韩杨朱秦尤许何吕施张孔曹严华金魏陶姜戚谢邹喻柏水窦章云苏潘葛奚范彭郎鲁韦昌马苗凤花方俞任袁柳酆鲍史唐费廉岑薛雷贺倪汤滕殷罗毕郝邬安常乐于时傅皮卞齐康伍余元卜顾孟平黄和穆萧尹姚邵堪汪祁毛禹狄米贝明臧计伏成戴谈宋茅庞熊纪舒屈项祝董梁杜阮蓝闵席季麻强贾路娄危江童颜郭梅盛林刁钟徐邱骆高夏蔡田丁番palxmnestrHdoudy]/;
 
             if (!result.name) {
                 // 策略1：找 "X名" 或 "姓名" 后面的内容
-                const nameLabelMatch = text.match(/[姓就]名[：:\s]*([\u4e00-\u9fa5]{2,4})/);
+                const nameLabelMatch = text.match(/[姓]名[：:\s]*([\u4e00-\u9fa5]{2,4})/);
                 if (nameLabelMatch) {
                     result.name = nameLabelMatch[1];
                 } else {
@@ -1609,7 +1607,8 @@
             const month = date.getMonth() + 1;
             const day = date.getDate();
             const monthNames = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            return selectedLanguage === 'en' ? `${monthNames[month]} ${day}, ${year}` : `${year}年${month}月${day}日`;
+            const weekdaysEn = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            return selectedLanguage === 'en' ? `${weekdaysEn[date.getDay()]}, ${monthNames[month]} ${day}, ${year}` : `${year}年${month}月${day}日`;
         }
 
         function addHours(timeStr, hours) {
@@ -1790,7 +1789,7 @@
                     <tr>
                         <td class="time-cell">${formattedDate} ${drinkTime}</td>
                         <td>${lang.labels.takeMed}</td>
-                        <td>${lang.labels.takeMedDesc.replaceAll('${packs}', heshuangPacks).replace('${volume}', heshuangPacks * 1000).replace('${simethiconeDesc}', simethiconeDesc)}</td>
+                        <td>${lang.labels.takeMedDesc.split('${packs}').join(heshuangPacks).replace('${volume}', heshuangPacks * 1000).replace('${simethiconeDesc}', simethiconeDesc)}</td>
                     </tr>
                     <tr class="alert-cell">
                         <td class="time-cell">${formattedDate} ${stopWaterTime}</td>
@@ -1824,12 +1823,12 @@
                     <tr class="alert-cell">
                         <td class="time-cell">${prevDateFormatted} 20:00<br><small style="color:#009FB1">${selectedLanguage === 'en' ? '(Day before)' : '（检查前一天）'}</small></td>
                         <td class="alert-warning">${lang.labels.firstDose}</td>
-                        <td class="alert-warning">${lang.labels.firstDoseDesc.replaceAll('${packs}', firstPacks).replace('${volume}', firstPacks * 1000)}</td>
+                        <td class="alert-warning">${lang.labels.firstDoseDesc.split('${packs}').join(firstPacks).replace('${volume}', firstPacks * 1000)}</td>
                     </tr>
                     <tr>
                         <td class="time-cell">${formattedDate} ${secondDrinkTime}</td>
                         <td>${lang.labels.secondDose}</td>
-                        <td>${lang.labels.secondDoseDesc.replaceAll('${packs}', secondPacks).replace('${volume}', secondPacks * 1000).replace('${simethiconeDesc}', simethiconeDesc)}</td>
+                        <td>${lang.labels.secondDoseDesc.split('${packs}').join(secondPacks).replace('${volume}', secondPacks * 1000).replace('${simethiconeDesc}', simethiconeDesc)}</td>
                     </tr>
                     <tr class="alert-cell">
                         <td class="time-cell">${formattedDate} ${stopWaterTime}</td>
