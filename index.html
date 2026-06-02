@@ -566,12 +566,12 @@
         }
 
         .footer p:first-child {
-            color: #fff;
+            color: #757575;
             font-weight: 500;
         }
 
         .footer p:last-child {
-            color: #fff;
+            color: #757575;
         }
 
         /* ========== 响应式布局 - 手机适配 ========== */
@@ -1177,7 +1177,7 @@
                     secondDose: '第2次服用',
                     secondDoseDesc: '1. 准备${volume}ml温水<br>2. 将${packs}包和爽倒入搅拌均匀<br>3. 在${packs}小时内缓慢喝完${simethiconeDesc}',
                     lowResidue: '低渣饮食',
-                    dietTitle: '饮食限制（检查前一天）<br><small>${date} 开始</small>',
+                    dietTitle: '低渣饮食要求（检查前一天，${date}开始）',
                     dietAllowed: '建议选择',
                     dietForbidden: '绝对禁止',
                     dietAllowedItems: [
@@ -1270,7 +1270,7 @@
                     secondDose: '2nd Dose',
                     secondDoseDesc: '1. Prepare ${volume}ml warm water<br>2. Dissolve ${packs} packet(s) of PEG solution<br>3. Drink slowly over ${packs} hours${simethiconeDesc}',
                     lowResidue: 'Low-Residue Diet',
-                    dietTitle: 'Diet Restrictions<br><small>(Day Before Procedure, Start from ${date})</small>',
+                    dietTitle: 'Low-Residue Diet Requirements<br><small>(Day Before Procedure, ${date})</small>',
                     dietAllowed: 'Allowed',
                     dietForbidden: 'Avoid',
                     dietAllowedItems: [
@@ -1597,10 +1597,10 @@
             }
         }
 
-        function getWeekday(dateStr) {
-            const date = new Date(dateStr);
-            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-            return weekdays[date.getDay()];
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
         }
 
         function formatDate(dateStr) {
@@ -1610,7 +1610,8 @@
             const day = date.getDate();
             const monthNames = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             const weekdaysEn = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            return selectedLanguage === 'en' ? `${weekdaysEn[date.getDay()]}, ${monthNames[month]} ${day}, ${year}` : `${year}年${month}月${day}日`;
+            const weekdaysZh = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            return selectedLanguage === 'en' ? `${weekdaysEn[date.getDay()]}, ${monthNames[month]} ${day}, ${year}` : `${year}年${month}月${day}日（${weekdaysZh[date.getDay()]}）`;
         }
 
         function addHours(timeStr, hours) {
@@ -1674,7 +1675,7 @@
         }
 
         function generateGuide() {
-            const name = document.getElementById('patientName').value.trim();
+            const name = escapeHtml(document.getElementById('patientName').value.trim());
             const appointmentDate = document.getElementById('appointmentDate').value;
             const appointmentTime = document.getElementById('appointmentTime').value;
             const examType = document.getElementById('examType').value;
@@ -1724,13 +1725,17 @@
 
             // 计算时间节点
             const formattedDate = formatDate(appointmentDate);
-            const weekday = getWeekday(appointmentDate);
             const arriveTime = subtractMinutes(appointmentTime, 10);
 
             // 计算前一天日期
             const prevDate = new Date(appointmentDate);
             prevDate.setDate(prevDate.getDate() - 1);
             const prevDateFormatted = formatDate(prevDate.toISOString().split('T')[0]);
+
+            // 计算前3天日期（肠镜/胃肠镜术前饮食限制起始）
+            const date3Before = new Date(appointmentDate);
+            date3Before.setDate(date3Before.getDate() - 3);
+            const date3BeforeFormatted = formatDate(date3Before.toISOString().split('T')[0]);
 
             // 获取准确时间
             const nearestTime = getNearestTime(examPeriod, appointmentTime);
@@ -1739,7 +1744,8 @@
             const simethiconeYes = simethicone === 'yes' ? (selectedLanguage === 'en' ? '+ Simethicone 1 bottle' : '+ 西甲硅油 1 瓶') : '';
             const simethiconeDesc = simethicone === 'yes' ? (selectedLanguage === 'en' ? '<br>4. After finishing, take 15ml Simethicone' : '<br>4. 喝完后，用针筒抽取西甲硅油15ml服用') : '';
             const arriveText = selectedLanguage === 'en' ? 'Please arrive 10 minutes early' : '请提前10分钟抵达诊所报到';
-            const lowResidueText = selectedLanguage === 'en' ? 'Low-Residue Diet' : '低渣饮食';
+            const lowResidueText = selectedLanguage === 'en' ? "Low-Residue Diet<br><small>(See 'Low-Residue Diet Requirements' below)</small>" : "低渣饮食<br><small>（详情请查看后文「低渣饮食要求」）</small>";
+            const threeDayDietText = selectedLanguage === 'en' ? 'Diet Restrictions Begin' : '🔔 开始饮食限制';
 
             let timelineRows = [];
             let medicationSteps = '';
@@ -1775,6 +1781,7 @@
                 const stopWaterTime = schedule.stopWater;
 
                 timelineRows = [
+                    { date: date3BeforeFormatted, time: selectedLanguage === 'en' ? 'All day' : '全天', event: threeDayDietText + (selectedLanguage === 'en' ? '<br><small>1. Stop taking iron supplements<br>2. Avoid foods with seeds & peels (dragon fruit, kiwi, watermelon, tomato, sesame, nuts, dried fruits, corn, brown rice, etc.)</small>' : '<br><small>1. 停止服用铁剂<br>2. 禁食含种子、果皮的食物（火龙果、奇异果、西瓜、番茄、芝麻、坚果、干果、玉米、糙米等）</small>'), isAlert: true },
                     { date: prevDateFormatted, time: selectedLanguage === 'en' ? 'All day' : '全天', event: lowResidueText, isAlert: false },
                     { date: formattedDate, time: fastingTime, event: (selectedLanguage === 'en' ? 'Start Fasting (clear liquids only)' : '<span class="emoji">⚠️</span> 开始禁食（只能喝清流质）'), isAlert: true },
                     { date: formattedDate, time: drinkTime, event: (selectedLanguage === 'en' ? 'Take bowel prep (' : '开始喝药（') + heshuangPacks + (selectedLanguage === 'en' ? ' packets PEG + ' : '包和爽 + ') + heshuangPacks + (selectedLanguage === 'en' ? '000ml water)' : '000ml 水）') + simethiconeYes, isAlert: false },
@@ -1800,7 +1807,6 @@
                     </tr>
                 `;
             } else {
-                const firstDrinkTime = schedule.firstDrink;
                 const secondDrinkTime = heshuangPacks === 4 ? schedule.secondDrink4 : schedule.secondDrink2_3;
                 const stopWaterTime = schedule.stopWater;
 
@@ -1814,6 +1820,7 @@
                 }
 
                 timelineRows = [
+                    { date: date3BeforeFormatted, time: selectedLanguage === 'en' ? 'All day' : '全天', event: threeDayDietText + (selectedLanguage === 'en' ? '<br><small>1. Stop taking iron supplements<br>2. Avoid foods with seeds & peels (dragon fruit, kiwi, watermelon, tomato, sesame, nuts, dried fruits, corn, brown rice, etc.)</small>' : '<br><small>1. 停止服用铁剂<br>2. 禁食含种子、果皮的食物（火龙果、奇异果、西瓜、番茄、芝麻、坚果、干果、玉米、糙米等）</small>'), isAlert: true },
                     { date: prevDateFormatted, time: selectedLanguage === 'en' ? 'All day' : '全天', event: lowResidueText, isAlert: false },
                     { date: prevDateFormatted, time: '20:00', event: (selectedLanguage === 'en' ? '1st Dose (' : '第1次服用（') + firstPacks + (selectedLanguage === 'en' ? ' packet(s) PEG + ' : '包和爽 + ') + firstPacks + (selectedLanguage === 'en' ? '000ml water)' : '000ml 水') + (selectedLanguage === 'en' ? ', then fast' : '），服药后开始禁食'), isAlert: true },
                     { date: formattedDate, time: secondDrinkTime, event: (selectedLanguage === 'en' ? '2nd Dose (' : '第2次服用（') + secondPacks + (selectedLanguage === 'en' ? ' packet(s) PEG + ' : '包和爽 + ') + secondPacks + (selectedLanguage === 'en' ? '000ml water)' : '000ml 水）') + simethiconeYes, isAlert: false },
@@ -1844,14 +1851,14 @@
             const greeting = lang.greeting.replace('${name}', name).replace('${selectedGender}', displayGender);
             const dietTitle = lang.labels.dietTitle.replace('${date}', prevDateFormatted);
 
-            const html = generateHTML(title, greeting, formattedDate, weekday, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, simethiconeDesc, isGastroscopyOnly);
+            const html = generateHTML(title, greeting, formattedDate, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, date3BeforeFormatted, simethiconeDesc, isGastroscopyOnly, selectedLanguage);
 
             document.getElementById('guideContent').innerHTML = html;
             document.getElementById('previewSection').classList.add('visible');
             document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function generateHTML(title, greeting, formattedDate, weekday, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, simethiconeDesc, isGastroscopyOnly) {
+        function generateHTML(title, greeting, formattedDate, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, date3BeforeFormatted, simethiconeDesc, isGastroscopyOnly, selectedLanguage) {
             return `
                 <div class="guide-header">
                     <h1>${title}</h1>
@@ -1862,7 +1869,7 @@
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="label">${lang.labels.appointmentDate}</span>
-                        <span class="value">${formattedDate}${selectedLanguage === 'en' ? '' : '（' + weekday + '）'}</span>
+                        <span class="value">${formattedDate}</span>
                     </div>
                     <div class="info-item">
                         <span class="label">${lang.labels.appointmentTime}</span>
@@ -1890,7 +1897,7 @@
                         <tbody>
                             ${timelineRows.map(row => `
                                 <tr ${row.isAlert ? 'class="alert-cell"' : ''}>
-                                    <td class="time-cell">${row.date}${row.date === prevDateFormatted ? (selectedLanguage === 'en' ? '<br><small style="color:#009FB1">(Day before)</small>' : '<br><small style="color:#009FB1">（检查前一天）</small>') : ''}</td>
+                                    <td class="time-cell">${row.date}${row.date === date3BeforeFormatted ? (selectedLanguage === 'en' ? '<br><small style="color:#009FB1">(3 days before)</small>' : '<br><small style="color:#009FB1">（检查前 3 天）</small>') : ''}${row.date === prevDateFormatted ? (selectedLanguage === 'en' ? '<br><small style="color:#009FB1">(Day before)</small>' : '<br><small style="color:#009FB1">（检查前 1 天）</small>') : ''}</td>
                                     <td class="time-cell">${row.time}</td>
                                     <td ${row.isAlert ? 'class="alert-warning"' : ''}>${row.event}</td>
                                 </tr>
