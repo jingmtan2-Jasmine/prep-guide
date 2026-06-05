@@ -259,6 +259,7 @@
         }
 
         .btn-primary:hover {
+            transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0, 159, 177, 0.35);
         }
 
@@ -371,7 +372,7 @@
             gap: 16px;
             margin: 20px 0;
             padding: 20px;
-            background: rgba(0, 159, 177, 0.10);
+            background: rgba(0, 159, 177, 0.08);
             border-radius: 10px;
         }
 
@@ -431,7 +432,7 @@
         }
 
         .timeline-table tr:hover {
-            background: rgba(0, 159, 177, 0.06);
+            background: rgba(0, 159, 177, 0.03);
         }
 
         .time-cell {
@@ -441,8 +442,7 @@
         }
 
         .alert-cell {
-            background: #FFE8CC !important;
-            border-left: 4px solid var(--accent);
+            background: #FFF3E0 !important;
         }
 
         .alert-warning {
@@ -476,7 +476,7 @@
         }
 
         .diet-allowed {
-            background: rgba(0, 159, 177, 0.10);
+            background: rgba(0, 159, 177, 0.08);
             border-left: 4px solid var(--primary);
         }
 
@@ -790,7 +790,7 @@
 
         @media print {
             @page {
-                size: A4 portrait;
+                size: auto;
                 margin: 10mm;
             }
 
@@ -798,7 +798,7 @@
                 background: white;
                 padding: 0;
                 margin: 0;
-                font-size: 12px;
+                font-size: 11px;
                 height: auto;
                 overflow: visible;
             }
@@ -813,7 +813,6 @@
 
             .container {
                 max-width: 100%;
-                width: 190mm;
                 margin: 0;
                 padding: 0;
             }
@@ -832,9 +831,9 @@
                 page-break-inside: avoid;
             }
 
-            /* 允许跨页，避免溢出 */
+            /* 强制单页打印 */
             .guide-content * {
-                page-break-inside: auto;
+                page-break-inside: avoid;
             }
 
             /* 优化打印字体和间距 */
@@ -872,17 +871,13 @@
             }
 
             .timeline-table {
-                font-size: 9px;
+                font-size: 10px;
                 margin: 8px 0;
             }
 
             .timeline-table th,
             .timeline-table td {
-                padding: 4px 3px;
-            }
-
-            .timeline-table td small {
-                font-size: 8px;
+                padding: 6px 4px;
             }
 
             .diet-grid {
@@ -1902,7 +1897,7 @@
                         <tbody>
                             ${timelineRows.map(row => `
                                 <tr ${row.isAlert ? 'class="alert-cell"' : ''}>
-                                    <td class="time-cell">${row.date}${row.date === date3BeforeFormatted ? (selectedLanguage === 'en' ? '<br><small style="color:#009FB1">(3 days before)</small>' : '<br><small style="color:#009FB1">（检查前 3 天）</small>') : ''}${row.date === prevDateFormatted ? (selectedLanguage === 'en' ? '<br><small style="color:#009FB1">(Day before)</small>' : '<br><small style="color:#009FB1">（检查前 1 天）</small>') : ''}${row.date === formattedDate && row.date !== date3BeforeFormatted && row.date !== prevDateFormatted ? (selectedLanguage === 'en' ? '<br><small style="color:#009FB1">(Exam day)</small>' : '<br><small style="color:#009FB1">（检查当天）</small>') : ''}</td>
+                                    <td class="time-cell">${row.date}${row.date === date3BeforeFormatted ? (selectedLanguage === 'en' ? '<br><small style="color:#009FB1">(3 days before)</small>' : '<br><small style="color:#009FB1">（检查前 3 天）</small>') : ''}${row.date === prevDateFormatted ? (selectedLanguage === 'en' ? '<br><small style="color:#009FB1">(Day before)</small>' : '<br><small style="color:#009FB1">（检查前 1 天）</small>') : ''}</td>
                                     <td class="time-cell">${row.time}</td>
                                     <td ${row.isAlert ? 'class="alert-warning"' : ''}>${row.event}</td>
                                 </tr>
@@ -1935,7 +1930,7 @@
                 </div>
 
                 <div class="section">
-                    <h4><span class="emoji">🍽️</span> ${dietTitle}</h4>
+                    <h4>🍽️ ${dietTitle}</h4>
                     <div class="diet-grid">
                         <div class="diet-allowed">
                             <h5><span class="emoji">✅</span> ${lang.labels.dietAllowed}</h5>
