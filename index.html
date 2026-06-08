@@ -245,13 +245,14 @@
                 flex-direction: column;
                 align-items: flex-start;
                 justify-content: center;
-                gap: 4px;
-                padding: 4px 0;
+                gap: 2px;
+                padding: 0;
+                margin-top: -4px;
             }
             header h1 {
                 font-size: 24px;
                 margin: 0;
-                line-height: 1.25;
+                line-height: 1.1;
                 letter-spacing: 0.5px;
                 color: var(--primary-dark);
             }
@@ -259,7 +260,7 @@
                 font-size: 13px;
                 margin: 0;
                 color: var(--text-light);
-                line-height: 1.3;
+                line-height: 1.2;
             }
 
             /* 操作按钮固定在右侧顶栏 */
@@ -2241,6 +2242,24 @@
 
                 ${isGastroscopyOnly ? '' : `
                 <div class="section">
+                    <h4>🍽️ ${dietTitle}</h4>
+                    <div class="diet-grid">
+                        <div class="diet-allowed">
+                            <h5><span class="emoji">✅</span> ${lang.labels.dietAllowed}</h5>
+                            <ul>
+                                ${lang.labels.dietAllowedItems.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="diet-forbidden">
+                            <h5><span class="emoji">🚫</span> ${lang.labels.dietForbidden}</h5>
+                            <ul>
+                                ${lang.labels.dietForbiddenItems.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
                     <h4><span class="emoji">💊</span> ${lang.labels.medication}</h4>
                     <p style="margin-bottom: 12px;">
                         ${lang.labels.medicationDrug.replace('${heshuangPacks}', heshuangPacks).replace('${simethiconeYes}', simethiconeYes)}
@@ -2259,24 +2278,6 @@
                     </table>
                     <div style="background: #E3F2FD; padding: 12px 16px; border-radius: 8px; margin-top: 12px; font-size: 13px;">
                         <strong>${selectedLanguage === 'en' ? 'Tip:' : '温馨提示：'}</strong> ${lang.labels.medicationTip}
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h4>🍽️ ${dietTitle}</h4>
-                    <div class="diet-grid">
-                        <div class="diet-allowed">
-                            <h5><span class="emoji">✅</span> ${lang.labels.dietAllowed}</h5>
-                            <ul>
-                                ${lang.labels.dietAllowedItems.map(item => `<li>${item}</li>`).join('')}
-                            </ul>
-                        </div>
-                        <div class="diet-forbidden">
-                            <h5><span class="emoji">🚫</span> ${lang.labels.dietForbidden}</h5>
-                            <ul>
-                                ${lang.labels.dietForbiddenItems.map(item => `<li>${item}</li>`).join('')}
-                            </ul>
-                        </div>
                     </div>
                 </div>
                 `}
