@@ -165,6 +165,16 @@
                 line-height: 1.4;
             }
 
+            .layout-left #medicationSection .hint {
+                grid-column: 1 / -1;
+                font-size: 10px;
+                line-height: 1.25;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                margin-top: -4px;
+            }
+
             /* 粘贴区紧凑化 */
             .layout-left .paste-section {
                 border-width: 1px;
@@ -1347,7 +1357,6 @@
                                 <option value="afternoon" selected>下午检查</option>
                                 <option value="morning">上午检查</option>
                             </select>
-                            <span class="hint">上午检查：前一晚20:00开始分次服药；下午检查：当天上午单次服药</span>
                         </div>
                         <div class="form-group">
                             <label>是否加服西甲硅油</label>
@@ -1356,6 +1365,7 @@
                                 <option value="no">否</option>
                             </select>
                         </div>
+                        <span class="hint">上午检查：前一晚20:00开始分次服药；下午检查：当天上午单次服药</span>
                     </div>
                 </div>
 
