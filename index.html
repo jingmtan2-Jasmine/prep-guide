@@ -1296,6 +1296,21 @@
                 </div>
 
                 <div class="form-section">
+                    <h2><span class="emoji">🗂️</span> 指引版本</h2>
+                    <div class="form-grid">
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>请选择本次发送的指引版本 <span class="required">*</span></label>
+                            <select id="guideVersion" onchange="toggleGuideVersion()">
+                                <option value="B" selected>B · 术前 4 天「已发药」完整版（默认）</option>
+                                <option value="A">A · 术前 4 天「未发药」版（无服药内容）</option>
+                                <option value="C">C · 术前一天「喝药 + 低渣饮食提醒」版</option>
+                            </select>
+                            <span class="hint" id="guideVersionHint">B 版：完整流程，含核心时间轴、低渣饮食、服药步骤详解。</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
                     <h2><span class="emoji">📋</span> 基本信息</h2>
                     <div class="form-grid">
                         <div class="form-group">
@@ -1999,9 +2014,26 @@
         // 切换胃镜专属模式（隐藏/显示和爽/服药相关表单）
         function toggleGastroscopyMode() {
             const examType = document.getElementById('examType').value;
+            const guideVersion = document.getElementById('guideVersion').value;
             const isGastroscopyOnly = examType === 'gastroscopy';
-            document.getElementById('heshuangPacksGroup').style.display = isGastroscopyOnly ? 'none' : '';
-            document.getElementById('medicationSection').style.display = isGastroscopyOnly ? 'none' : '';
+            // A 版（未发药）也要隐藏和爽 + 服药方案
+            const hidePackAndMedication = isGastroscopyOnly || guideVersion === 'A';
+            document.getElementById('heshuangPacksGroup').style.display = hidePackAndMedication ? 'none' : '';
+            document.getElementById('medicationSection').style.display = hidePackAndMedication ? 'none' : '';
+        }
+
+        // 切换指引版本（A 未发药 / B 已发药完整 / C 术前一天）
+        function toggleGuideVersion() {
+            const v = document.getElementById('guideVersion').value;
+            const hintEl = document.getElementById('guideVersionHint');
+            const hintMap = {
+                A: 'A 版：术前 4 天，患者尚未发药。生成内容含 ① 预约信息 ② 核心时间轴 ③ 低渣饮食 ④ 重要提醒；不含服药步骤详解。',
+                B: 'B 版：完整流程，含核心时间轴、低渣饮食、服药步骤详解。',
+                C: 'C 版：术前一天提醒。内容同 B 版，但核心时间轴中省略「检查前 3 天」一行。'
+            };
+            if (hintEl) hintEl.textContent = hintMap[v] || hintMap.B;
+            // 联动隐藏/显示和爽 & 服药方案
+            toggleGastroscopyMode();
         }
 
         function generateGuide() {
@@ -2009,6 +2041,7 @@
             const appointmentDate = document.getElementById('appointmentDate').value;
             const appointmentTime = document.getElementById('appointmentTime').value;
             const examType = document.getElementById('examType').value;
+            const guideVersion = document.getElementById('guideVersion').value;
             const heshuangPacks = parseInt(document.getElementById('heshuangPacks').value);
             const examPeriod = document.getElementById('examPeriod').value;
             const simethicone = document.getElementById('simethicone').value;
@@ -2115,7 +2148,9 @@
                     { date: date3BeforeFormatted, time: selectedLanguage === 'en' ? 'All day' : '全天', event: threeDayDietText + (selectedLanguage === 'en' ? '<br><small>1. Stop taking iron supplements<br>2. Avoid foods with seeds & peels (dragon fruit, kiwi, watermelon, tomato, sesame, nuts, dried fruits, corn, brown rice, etc.)</small>' : '<br><small>1. 停止服用铁剂<br>2. 禁食含种子、果皮的食物（火龙果、奇异果、西瓜、番茄、芝麻、坚果、干果、玉米、糙米等）</small>'), isAlert: true },
                     { date: prevDateFormatted, time: selectedLanguage === 'en' ? 'All day' : '全天', event: lowResidueText, isAlert: false },
                     { date: formattedDate, time: fastingTime, event: (selectedLanguage === 'en' ? 'Start Fasting (clear liquids only)' : '<span class="emoji">⚠️</span> 开始禁食（只能喝清流质）'), isAlert: true },
-                    { date: formattedDate, time: drinkTime, event: (selectedLanguage === 'en' ? 'Take bowel prep (' : '开始喝药（') + heshuangPacks + (selectedLanguage === 'en' ? ' packets PEG + ' : '包和爽 + ') + heshuangPacks + (selectedLanguage === 'en' ? '000ml water)' : '000ml 水）') + simethiconeYes, isAlert: false },
+                    { date: formattedDate, time: drinkTime, event: (guideVersion === 'A')
+                        ? (selectedLanguage === 'en' ? 'Take bowel prep' : '开始喝药')
+                        : ((selectedLanguage === 'en' ? 'Take bowel prep (' : '开始喝药（') + heshuangPacks + (selectedLanguage === 'en' ? ' packets PEG + ' : '包和爽 + ') + heshuangPacks + (selectedLanguage === 'en' ? '000ml water)' : '000ml 水）') + simethiconeYes), isAlert: false },
                     { date: formattedDate, time: stopWaterTime, event: (selectedLanguage === 'en' ? 'Stop All Liquids' : '<span class="emoji">⚠️</span> 开始禁水（不能再喝任何液体）'), isAlert: true },
                     { date: formattedDate, time: arriveTime, event: arriveText, isAlert: false }
                 ];
@@ -2182,7 +2217,16 @@
             const greeting = lang.greeting.replace('${name}', name).replace('${selectedGender}', displayGender);
             const dietTitle = lang.labels.dietTitle.replace('${date}', prevDateFormatted);
 
-            const html = generateHTML(title, greeting, formattedDate, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, date3BeforeFormatted, simethiconeDesc, isGastroscopyOnly, selectedLanguage);
+            // 版本差异：A 隐藏服药段；C 隐藏"检查前 3 天"行
+            const isVersionA = (guideVersion === 'A');
+            const isVersionC = (guideVersion === 'C');
+            const hideMedication = isGastroscopyOnly || isVersionA;
+            // C 版从时间轴里剔除"检查前 3 天"那一行（识别依据：日期 === date3BeforeFormatted）
+            const filteredTimelineRows = isVersionC
+                ? timelineRows.filter(row => row.date !== date3BeforeFormatted)
+                : timelineRows;
+
+            const html = generateHTML(title, greeting, formattedDate, appointmentTime, examTypeText, examTypeDesc, filteredTimelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, date3BeforeFormatted, simethiconeDesc, isGastroscopyOnly, selectedLanguage, hideMedication);
 
             document.getElementById('guideContent').innerHTML = html;
             document.getElementById('previewSection').classList.add('visible');
@@ -2192,7 +2236,7 @@
             }
         }
 
-        function generateHTML(title, greeting, formattedDate, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, date3BeforeFormatted, simethiconeDesc, isGastroscopyOnly, selectedLanguage) {
+        function generateHTML(title, greeting, formattedDate, appointmentTime, examTypeText, examTypeDesc, timelineRows, medicationSteps, dietTitle, heshuangPacks, simethiconeYes, lang, prevDateFormatted, date3BeforeFormatted, simethiconeDesc, isGastroscopyOnly, selectedLanguage, hideMedication) {
             return `
                 <div class="guide-header">
                     <h1>${title}</h1>
@@ -2259,6 +2303,7 @@
                     </div>
                 </div>
 
+                ${hideMedication ? '' : `
                 <div class="section">
                     <h4><span class="emoji">💊</span> ${lang.labels.medication}</h4>
                     <p style="margin-bottom: 12px;">
@@ -2281,11 +2326,12 @@
                     </div>
                 </div>
                 `}
+                `}
 
                 <div class="important-notes">
                     <h4><span class="emoji">⚠️</span> ${lang.labels.notesTitle}</h4>
                     <ul>
-                        ${(isGastroscopyOnly ? lang.labels.notes.filter(note => !note.includes('和爽效果') && !note.includes('Effectiveness:')) : lang.labels.notes).map(note => `<li>${note}</li>`).join('')}
+                        ${(hideMedication ? lang.labels.notes.filter(note => !note.includes('和爽效果') && !note.includes('Effectiveness:')) : lang.labels.notes).map(note => `<li>${note}</li>`).join('')}
                     </ul>
                 </div>
 
@@ -2315,7 +2361,7 @@
             tomorrow.setDate(tomorrow.getDate() + 1);
             document.getElementById('appointmentDate').value = tomorrow.toISOString().split('T')[0];
             document.getElementById('appointmentTime').value = '15:30';
-            toggleGastroscopyMode(); // 初始化表单显示状态
+            toggleGuideVersion(); // 初始化版本提示 + 联动表单显示
         });
     </script>
     <!-- 保存功能库：defer 延迟加载，不阻塞页面渲染 -->
