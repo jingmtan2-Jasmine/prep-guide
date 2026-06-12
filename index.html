@@ -1374,14 +1374,14 @@
                                 <option value="morning">上午检查</option>
                             </select>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" id="simethiconeGroup">
                             <label>是否加服西甲硅油</label>
                             <select id="simethicone">
                                 <option value="yes" selected>是（建议服用，消除气泡）</option>
                                 <option value="no">否</option>
                             </select>
                         </div>
-                        <span class="hint">上午检查：前一晚20:00开始分次服药；下午检查：当天上午单次服药</span>
+                        <span class="hint" id="medicationHint">上午检查：前一晚20:00开始分次服药；下午检查：当天上午单次服药</span>
                     </div>
                 </div>
 
@@ -2014,10 +2014,13 @@
             const examType = document.getElementById('examType').value;
             const guideVersion = document.getElementById('guideVersion').value;
             const isGastroscopyOnly = examType === 'gastroscopy';
-            // A 版（未发药）也要隐藏和爽 + 服药方案
-            const hidePackAndMedication = isGastroscopyOnly || guideVersion === 'A';
-            document.getElementById('heshuangPacksGroup').style.display = hidePackAndMedication ? 'none' : '';
-            document.getElementById('medicationSection').style.display = hidePackAndMedication ? 'none' : '';
+            const isVersionA = guideVersion === 'A';
+            // 胃镜：隐藏和爽 + 整个服药方案区
+            // A 版（未发药）：隐藏和爽，但保留服药方案区（只隐藏西甲硅油和提示）
+            document.getElementById('heshuangPacksGroup').style.display = (isGastroscopyOnly || isVersionA) ? 'none' : '';
+            document.getElementById('medicationSection').style.display = isGastroscopyOnly ? 'none' : '';
+            document.getElementById('simethiconeGroup').style.display = (isGastroscopyOnly || isVersionA) ? 'none' : '';
+            document.getElementById('medicationHint').style.display = (isGastroscopyOnly || isVersionA) ? 'none' : '';
         }
 
         // 切换指引版本（A 未发药 / B 已发药完整 / C 术前一天）
