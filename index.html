@@ -701,13 +701,14 @@
 
         .diet-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 12px;
             margin: 12px 0;
+            align-items: stretch;
         }
 
         .diet-allowed, .diet-forbidden {
-            padding: 16px;
+            padding: 12px 14px;
             border-radius: 10px;
         }
 
@@ -723,7 +724,7 @@
 
         .diet-allowed h5, .diet-forbidden h5 {
             font-size: 14px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .diet-allowed h5 { color: var(--primary-dark); }
@@ -1216,9 +1217,9 @@
         .diet-allowed ul li,
         .diet-forbidden ul li {
             position: relative;
-            padding-left: 20px;
-            margin-bottom: 8px;
-            line-height: 1.6;
+            padding-left: 18px;
+            margin-bottom: 6px;
+            line-height: 1.5;
         }
         .preview-content ul li::before,
         .important-notes ul li::before,
@@ -2110,7 +2111,7 @@
             const simethiconeDesc = simethicone === 'yes' ? (selectedLanguage === 'en' ? `<br>4. After finishing, take ${simethiconeMl}ml Simethicone` : `<br>4. 喝完后，用针筒抽取西甲硅油${simethiconeMl}ml服用`) : '';
             const arriveText = selectedLanguage === 'en' ? 'Please arrive 10 minutes early' : '请提前10分钟抵达诊所报到';
             const lowResidueText = selectedLanguage === 'en' ? "Low-Residue Diet<br><small>(See 'Low-Residue Diet Requirements' below)</small>" : "低渣饮食<br><small>（详情请查看后文「低渣饮食要求」）</small>";
-            const threeDayDietText = selectedLanguage === 'en' ? 'Diet Restrictions Begin' : '🔔 开始饮食限制';
+            const threeDayDietText = selectedLanguage === 'en' ? '🔔 Diet Restrictions Begin' : '🔔 开始饮食限制';
 
             let timelineRows = [];
             let medicationSteps = '';
